@@ -4,11 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "echo 'No dev script configured'",
+    "dev": "http-server . -p 8080 -c-1 --cors",
     "build": "echo 'No build script configured'",
-    "start": "echo 'No start script configured'"
+    "start": "npm run dev"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
 }
