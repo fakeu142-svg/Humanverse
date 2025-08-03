@@ -1,0 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Code+Pro:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 47 27 20; /* desert-900 */
+    --foreground: 218 165 32; /* desert-300 */
+
+    --card: 139 69 19; /* desert-500 */
+    --card-foreground: 245 230 211; /* desert-100 */
+
+    --popover: 47 27 20; /* desert-900 */
+    --popover-foreground: 218 165 32; /* desert-300 */
+
+    --primary: 218 165 32; /* desert-300 */
+    --primary-foreground: 47 27 20; /* desert-900 */
+
+    --secondary: 139 69 19; /* desert-500 */
+    --secondary-foreground: 245 230 211; /* desert-100 */
+
+    --muted: 88 42 13; /* desert-800 */
+    --muted-foreground: 196 148 26; /* desert-400 */
+
+    --accent: 122 60 16; /* desert-600 */
+    --accent-foreground: 245 230 211; /* desert-100 */
+
+    --destructive: 220 38 38;
+    --destructive-foreground: 248 250 252;
+
+    --border: 88 42 13; /* desert-800 */
+    --input: 122 60 16; /* desert-600 */
+    --ring: 218 165 32; /* desert-300 */
+
+    --radius: 0.5rem;
+  }
+
+  .admin-theme {
+    --background: 31 31 31; /* admin-900 */
+    --foreground: 229 229 229; /* admin-200 */
+
+    --card: 45 45 45; /* admin-700 */
+    --card-foreground: 229 229 229; /* admin-200 */
+
+    --popover: 31 31 31; /* admin-900 */
+    --popover-foreground: 229 229 229; /* admin-200 */
+
+    --primary: 220 38 38; /* danger */
+    --primary-foreground: 248 250 252;
+
+    --secondary: 64 64 64; /* admin-600 */
+    --secondary-foreground: 229 229 229; /* admin-200 */
+
+    --muted: 45 45 45; /* admin-700 */
+    --muted-foreground: 157 157 157; /* admin-400 */
+
+    --accent: 82 82 82; /* admin-600 */
+    --accent-foreground: 248 248 248; /* admin-50 */
+
+    --destructive: 220 38 38;
+    --destructive-foreground: 248 250 252;
+
+    --border: 64 64 64; /* admin-600 */
+    --input: 45 45 45; /* admin-700 */
+    --ring: 220 38 38; /* danger */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+/* Custom scrollbar for desert theme */
+@layer components {
+  .scrollbar-desert::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .scrollbar-desert::-webkit-scrollbar-track {
+    @apply bg-desert-800;
+  }
+  
+  .scrollbar-desert::-webkit-scrollbar-thumb {
+    @apply bg-desert-600 rounded-full;
+  }
+  
+  .scrollbar-desert::-webkit-scrollbar-thumb:hover {
+    @apply bg-desert-500;
+  }
+
+  /* Admin scrollbar */
+  .scrollbar-admin::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .scrollbar-admin::-webkit-scrollbar-track {
+    @apply bg-admin-800;
+  }
+  
+  .scrollbar-admin::-webkit-scrollbar-thumb {
+    @apply bg-admin-600 rounded-full;
+  }
+  
+  .scrollbar-admin::-webkit-scrollbar-thumb:hover {
+    @apply bg-admin-500;
+  }
+
+  /* Mask type specific styles */
+  .mask-ashfox {
+    @apply text-mask-ashfox border-mask-ashfox/30;
+  }
+  
+  .mask-violetcrow {
+    @apply text-mask-violetcrow border-mask-violetcrow/30;
+  }
+  
+  .mask-echodust {
+    @apply text-mask-echodust border-mask-echodust/30;
+  }
+  
+  .mask-ironsage {
+    @apply text-mask-ironsage border-mask-ironsage/30;
+  }
+  
+  .mask-ghostwind {
+    @apply text-mask-ghostwind border-mask-ghostwind/30;
+  }
+
+  /* Glass morphism effect */
+  .glass-desert {
+    @apply bg-desert-800/20 backdrop-blur-sm border border-desert-600/30;
+  }
+  
+  .glass-admin {
+    @apply bg-admin-800/20 backdrop-blur-sm border border-admin-600/30;
+  }
+
+  /* Surveillance UI animations */
+  .surveillance-grid {
+    background-image: 
+      linear-gradient(rgba(220, 38, 38, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(220, 38, 38, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .surveillance-pulse {
+    animation: pulse-danger 2s infinite;
+  }
+  
+  .scanning-line {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .scanning-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(220, 38, 38, 0.3),
+      transparent
+    );
+    animation: surveillance-scan 2s linear infinite;
+  }
+}
+
+/* Print styles for admin reports */
+@media print {
+  .admin-theme {
+    --background: 255 255 255;
+    --foreground: 0 0 0;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --background: 0 0 0;
+    --foreground: 255 255 255;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
