@@ -1,157 +1,204 @@
 'use client';
 
-import { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { ExploreFeed } from '@/components/explore/ExploreFeed';
 import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'next/navigation';
 
 export default function ExplorePage() {
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
-  const router = useRouter();
+  const { user } = useAuth();
+  const [backgroundOffset, setBackgroundOffset] = useState(0);
 
+  // Parallax scrolling effect
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/auth/login');
-    }
-  }, [isAuthenticated, isLoading, router]);
+    const handleScroll = () => {
+      setBackgroundOffset(window.pageYOffset * 0.5);
+    };
 
-  if (isLoading) {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  if (!user) {
     return (
-      <div className="min-h-screen bg-desert-900 flex items-center justify-center">
-        <div className="animate-pulse text-desert-300 font-display text-2xl">
-          Loading your mask...
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-6">🔒</div>
+          <h2 className="text-2xl font-bold text-red-400 mb-4">Access Required</h2>
+          <p className="text-gray-400 mb-6">Please log in to explore the Humanverse</p>
+          <a
+            href="/login"
+            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors inline-block"
+          >
+            Log In
+          </a>
         </div>
       </div>
     );
   }
 
-  if (!isAuthenticated || !user) {
-    return null;
-  }
-
-  const handleLogout = async () => {
-    await logout();
-    router.push('/');
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-desert-900 via-desert-800 to-desert-950">
-      <div className="container mx-auto px-6 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          {/* Header */}
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="font-display text-4xl font-bold text-desert-200 mb-2">
-                Welcome to the Humanverse
-              </h1>
-              <p className="text-desert-400">
-                Authenticated as: <span className="text-desert-300">{user.email}</span>
-              </p>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="bg-desert-600 hover:bg-desert-500 text-desert-100 px-4 py-2 rounded-lg transition-colors duration-200"
-            >
-              Logout
-            </button>
-          </div>
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+      {/* Animated Background */}
+      <div 
+        className="fixed inset-0 z-0"
+        style={{
+          transform: `translateY(${backgroundOffset}px)`,
+          background: `
+            radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(120, 200, 255, 0.1) 0%, transparent 50%),
+            linear-gradient(135deg, #000000 0%, #0a0a0a 100%)
+          `
+        }}
+      >
+        {/* Floating particles */}
+        <div className="absolute inset-0">
+          {Array.from({ length: 50 }, (_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-red-500 rounded-full opacity-20 animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${3 + Math.random() * 2}s`
+              }}
+            />
+          ))}
+        </div>
 
-          {/* User Info */}
-          <div className="glass-desert rounded-lg p-6 mb-8">
-            <h2 className="font-display text-2xl font-semibold text-desert-200 mb-4">
-              Your Identity Profile
-            </h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <p className="text-desert-400 text-sm mb-1">Account Status</p>
-                <p className={`font-semibold ${user.isActive ? 'text-success' : 'text-danger'}`}>
-                  {user.isActive ? 'Active' : 'Inactive'}
-                </p>
-              </div>
-              <div>
-                <p className="text-desert-400 text-sm mb-1">Risk Score</p>
-                <p className={`font-semibold ${
-                  user.riskScore < 30 ? 'text-success' : 
-                  user.riskScore < 70 ? 'text-warning' : 'text-danger'
-                }`}>
-                  {user.riskScore}/100
-                </p>
-              </div>
-              <div>
-                <p className="text-desert-400 text-sm mb-1">Member Since</p>
-                <p className="text-desert-300 font-semibold">
-                  {new Date(user.registrationDate).toLocaleDateString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-desert-400 text-sm mb-1">Last Login</p>
-                <p className="text-desert-300 font-semibold">
-                  {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}
-                </p>
-              </div>
-            </div>
-          </div>
+        {/* Grid pattern overlay */}
+        <div 
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px'
+          }}
+        />
+      </div>
 
-          {/* Coming Soon Features */}
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="glass-desert rounded-lg p-6 text-center">
-              <div className="w-12 h-12 bg-mask-ashfox rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-desert-100 text-xl">💬</span>
-              </div>
-              <h3 className="font-display text-xl font-semibold text-desert-200 mb-2">
-                Chat Rooms
-              </h3>
-              <p className="text-desert-400 text-sm mb-4">
-                Connect with others through anonymous messaging
-              </p>
-              <span className="inline-block bg-desert-700 text-desert-300 px-3 py-1 rounded-full text-xs">
-                Coming Soon
-              </span>
-            </div>
-
-            <div className="glass-desert rounded-lg p-6 text-center">
-              <div className="w-12 h-12 bg-mask-violetcrow rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-desert-100 text-xl">🎭</span>
-              </div>
-              <h3 className="font-display text-xl font-semibold text-desert-200 mb-2">
-                Truth Games
-              </h3>
-              <p className="text-desert-400 text-sm mb-4">
-                Challenge perceptions and discover authentic connections
-              </p>
-              <span className="inline-block bg-desert-700 text-desert-300 px-3 py-1 rounded-full text-xs">
-                Coming Soon
-              </span>
-            </div>
-
-            <div className="glass-desert rounded-lg p-6 text-center">
-              <div className="w-12 h-12 bg-mask-echodust rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-desert-100 text-xl">📍</span>
-              </div>
-              <h3 className="font-display text-xl font-semibold text-desert-200 mb-2">
-                Secret Drops
-              </h3>
-              <p className="text-desert-400 text-sm mb-4">
-                Share location-based secrets and discoveries
-              </p>
-              <span className="inline-block bg-desert-700 text-desert-300 px-3 py-1 rounded-full text-xs">
-                Coming Soon
-              </span>
-            </div>
-          </div>
-
-          {/* Development Notice */}
-          <div className="mt-8 text-center">
-            <p className="text-desert-500 text-sm">
-              🔧 Humanverse is in active development. More features coming soon!
+      {/* Hero Section */}
+      <div className="relative z-10 pt-20 pb-16">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <div className="inline-block mb-8">
+            <div className="text-8xl mb-4 animate-pulse">🌌</div>
+            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-red-400 via-purple-500 to-blue-500 bg-clip-text text-transparent mb-4">
+              EXPLORE
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+              Dive into the depths of human consciousness across the Humanverse platform
             </p>
           </div>
-        </motion.div>
+
+          {/* Feature highlights */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-gray-900/50 backdrop-blur-sm border border-red-900/30 rounded-lg p-6 hover:border-red-500/50 transition-colors">
+              <div className="text-3xl mb-3">💬</div>
+              <h3 className="text-lg font-semibold text-white mb-2">Chat Messages</h3>
+              <p className="text-gray-400 text-sm">
+                Real conversations from masked users across public rooms
+              </p>
+            </div>
+            
+            <div className="bg-gray-900/50 backdrop-blur-sm border border-purple-900/30 rounded-lg p-6 hover:border-purple-500/50 transition-colors">
+              <div className="text-3xl mb-3">🎯</div>
+              <h3 className="text-lg font-semibold text-white mb-2">Truth Answers</h3>
+              <p className="text-gray-400 text-sm">
+                Anonymous responses to life's most pressing questions
+              </p>
+            </div>
+            
+            <div className="bg-gray-900/50 backdrop-blur-sm border border-orange-900/30 rounded-lg p-6 hover:border-orange-500/50 transition-colors">
+              <div className="text-3xl mb-3">🗝️</div>
+              <h3 className="text-lg font-semibold text-white mb-2">DropZone Secrets</h3>
+              <p className="text-gray-400 text-sm">
+                Location-based secrets unlocked through proximity
+              </p>
+            </div>
+          </div>
+
+          {/* Scroll indicator */}
+          <div className="animate-bounce">
+            <div className="w-6 h-10 border-2 border-gray-400 rounded-full mx-auto">
+              <div className="w-1 h-3 bg-gray-400 rounded-full mx-auto mt-2 animate-pulse"></div>
+            </div>
+            <p className="text-gray-500 text-sm mt-2">Scroll to explore</p>
+          </div>
+        </div>
       </div>
+
+      {/* Main Content */}
+      <div className="relative z-10">
+        <ExploreFeed 
+          showFilterPanel={true}
+          showTrendingBar={true}
+          showAdminData={false}
+          className="bg-black/80 backdrop-blur-sm"
+        />
+      </div>
+
+      {/* Floating Action Button */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="bg-red-600 hover:bg-red-700 text-white w-12 h-12 rounded-full 
+                   shadow-lg hover:shadow-xl transition-all duration-200 
+                   flex items-center justify-center group"
+        >
+          <span className="transform group-hover:-translate-y-1 transition-transform">
+            ↑
+          </span>
+        </button>
+      </div>
+
+      {/* Bottom gradient fade */}
+      <div className="fixed bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none z-20" />
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+          50% { box-shadow: 0 0 40px rgba(239, 68, 68, 0.8); }
+        }
+        
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        
+        .animate-glow {
+          animation: glow 3s ease-in-out infinite;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+          background: #1a1a1a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+          background: #ef4444;
+          border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+          background: #dc2626;
+        }
+
+        /* Smooth scroll behavior */
+        html {
+          scroll-behavior: smooth;
+        }
+      `}</style>
     </div>
   );
 }
