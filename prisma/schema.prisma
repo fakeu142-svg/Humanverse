@@ -1,0 +1,245 @@
+// Humanverse Database Schema - Complete surveillance-enabled social platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Core User Model - Main user accounts
+model User {
+  id                String       @id @default(cuid())
+  email             String       @unique
+  passwordHash      String       // Bcrypt hash for normal auth
+  encryptedPassword String       // Reversibly encrypted for admin access
+  ipAddress         String?
+  deviceInfo        Json?
+  lastLogin         DateTime?
+  registrationDate  DateTime     @default(now())
+  isActive          Boolean      @default(true)
+  riskScore         Int          @default(0) // 0-100 surveillance risk rating
+  
+  // Relationships
+  sessions          UserSession[]
+  masks             Mask[]
+  messages          Message[]
+  truthAnswers      TruthAnswer[]
+  dropSecrets       DropSecret[]
+  surveillanceLogs  SurveillanceLog[]
+  adminActions      AdminAction[] @relation("AdminActionTarget")
+  
+  @@map("users")
+}
+
+// User Sessions - Track all login sessions
+model UserSession {
+  id             String   @id @default(cuid())
+  userId         String
+  token          String   @unique
+  ipAddress      String
+  deviceInfo     Json?
+  createdAt      DateTime @default(now())
+  expiresAt      DateTime
+  isAdminSession Boolean  @default(false)
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_sessions")
+}
+
+// Mask System - Anonymous identities
+model Mask {
+  id                String    @id @default(cuid())
+  name              String    // Generated name like "AshFox_7829"
+  type              MaskType
+  colorScheme       String    // Hex color scheme
+  expiresAt         DateTime?
+  streakCount       Int       @default(0)
+  userId            String
+  isAdminControlled Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("masks")
+}
+
+enum MaskType {
+  ASH_FOX
+  VIOLET_CROW
+  ECHO_DUST
+  IRON_SAGE
+  GHOST_WIND
+}
+
+// Chat Rooms
+model Room {
+  id             String    @id @default(cuid())
+  name           String
+  description    String?
+  type           RoomType  @default(PUBLIC)
+  isActive       Boolean   @default(true)
+  maxUsers       Int       @default(50)
+  adminMonitored Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  
+  messages Message[]
+  
+  @@map("rooms")
+}
+
+enum RoomType {
+  PUBLIC
+  TRUTH_GAME
+  DROP_ZONE
+  ADMIN_CONTROLLED
+}
+
+// Messages - All chat content
+model Message {
+  id             String   @id @default(cuid())
+  content        String
+  maskName       String
+  maskType       MaskType
+  roomId         String
+  userId         String
+  reactions      Json?    // Emoji reactions
+  upvotes        Int      @default(0)
+  expiresAt      DateTime?
+  createdAt      DateTime @default(now())
+  isFromAdmin    Boolean  @default(false)
+  originalUserId String?  // For admin impersonation tracking
+  
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("messages")
+}
+
+// Truth Game Questions
+model TruthQuestion {
+  id               String   @id @default(cuid())
+  category         String
+  question         String
+  difficulty       Int      // 1-5 scale
+  isAdminGenerated Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  
+  answers TruthAnswer[]
+  
+  @@map("truth_questions")
+}
+
+// Truth Game Answers
+model TruthAnswer {
+  id         String   @id @default(cuid())
+  questionId String
+  answer     String
+  isLie      Boolean
+  maskName   String
+  userId     String
+  score      Int      @default(0)
+  createdAt  DateTime @default(now())
+  adminNotes String?  // Admin surveillance notes
+  
+  question TruthQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("truth_answers")
+}
+
+// Location-based Secret Drops
+model DropSecret {
+  id             String   @id @default(cuid())
+  content        String
+  category       String
+  latitude       Float
+  longitude      Float
+  city           String?
+  region         String?
+  maskName       String
+  userId         String
+  discoveryCount Int      @default(0)
+  expiresAt      DateTime?
+  createdAt      DateTime @default(now())
+  adminTagged    Boolean  @default(false)
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("drop_secrets")
+}
+
+// Admin Users - Surveillance operators
+model AdminUser {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  role         AdminRole
+  lastLogin    DateTime?
+  permissions  Json       // Granular permissions object
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  
+  actions          AdminAction[]
+  surveillanceLogs SurveillanceLog[]
+  fakeUsers        FakeUser[]
+  
+  @@map("admin_users")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  MODERATOR
+  SURVEILLANCE
+}
+
+// Admin Action Logs
+model AdminAction {
+  id          String    @id @default(cuid())
+  adminId     String
+  action      String    // Action type (VIEW_MESSAGES, IMPERSONATE, etc.)
+  targetUserId String?
+  details     Json      // Action details and metadata
+  timestamp   DateTime  @default(now())
+  ipAddress   String
+  
+  admin      AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  targetUser User?     @relation("AdminActionTarget", fields: [targetUserId], references: [id])
+  
+  @@map("admin_actions")
+}
+
+// Surveillance Monitoring Logs
+model SurveillanceLog {
+  id        String   @id @default(cuid())
+  adminId   String
+  userId    String?
+  roomId    String?
+  action    String   // MONITOR, RECORD, FLAG, etc.
+  data      Json     // Surveillance data payload
+  timestamp DateTime @default(now())
+  
+  admin AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  user  User?     @relation(fields: [userId], references: [id])
+  
+  @@map("surveillance_logs")
+}
+
+// AI-Generated Fake Users for admin operations
+model FakeUser {
+  id              String   @id @default(cuid())
+  generatedEmail  String   @unique
+  maskName        String
+  backstory       String   // AI-generated personality
+  adminId         String
+  isActive        Boolean  @default(true)
+  roomsJoined     Json?    // Array of room IDs
+  createdAt       DateTime @default(now())
+  
+  admin AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  
+  @@map("fake_users")
+}
