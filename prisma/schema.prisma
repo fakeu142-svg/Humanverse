@@ -119,36 +119,157 @@ model Message {
   @@map("messages")
 }
 
-// Truth Game Questions
+// Truth Game Questions - Comprehensive psychological database
 model TruthQuestion {
-  id               String   @id @default(cuid())
-  category         String
+  id               String            @id @default(cuid())
+  category         TruthCategory
+  subcategory      String?
   question         String
-  difficulty       Int      // 1-5 scale
-  isAdminGenerated Boolean  @default(false)
-  createdAt        DateTime @default(now())
-  
-  answers TruthAnswer[]
-  
+  difficulty       Int               // 1-5 scale
+  psychTags        String[]          // Psychological targeting tags
+  emotionalTrigger String?           // Fear, shame, desire, etc.
+  isAdminGenerated Boolean           @default(false)
+  targetDemographic String?          // Age, gender, etc.
+  vulnerabilityType String?          // What this question exploits
+  createdAt        DateTime          @default(now())
+
+  answers  TruthAnswer[]
+  guesses  TruthGuess[]
+  profiles QuestionProfile[]
+
   @@map("truth_questions")
 }
 
-// Truth Game Answers
+enum TruthCategory {
+  FEAR
+  CONFESSION
+  DESIRE
+  MEMORY
+  FUTURE
+  SHAME
+  REGRET
+  FANTASY
+  TRAUMA
+  AMBITION
+}
+
+// Truth Game Answers - Enhanced with psychological analysis
 model TruthAnswer {
-  id         String   @id @default(cuid())
-  questionId String
-  answer     String
-  isLie      Boolean
-  maskName   String
-  userId     String
-  score      Int      @default(0)
-  createdAt  DateTime @default(now())
-  adminNotes String?  // Admin surveillance notes
-  
-  question TruthQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id                String       @id @default(cuid())
+  questionId        String
+  answer            String
+  isLie             Boolean
+  maskName          String
+  userId            String
+  emotionalIntensity Int         @default(0) // 1-10 scale
+  vulnerabilityScore Int         @default(0) // Admin analysis 1-100
+  believabilityScore Int         @default(0) // How believable 1-10
+  adminNotes         String?     // Admin surveillance notes
+  psychAnalysis      Json?       // AI sentiment/emotion analysis
+  isManipulated      Boolean     @default(false) // Admin planted answer
+  score              Int         @default(0)
+  createdAt          DateTime    @default(now())
+
+  question    TruthQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guesses     TruthGuess[]
+  behavioral  BehavioralInsight[]
+
   @@map("truth_answers")
+}
+
+// Truth/Lie Guessing System
+model TruthGuess {
+  id         String    @id @default(cuid())
+  questionId String
+  answerId   String
+  guesserUserId String
+  isCorrect  Boolean?  // null until revealed
+  guessedTruth Boolean // true = truth, false = lie
+  confidence Int       @default(5) // 1-10 confidence level
+  reasoning  String?   // Why they think it's truth/lie
+  score      Int       @default(0)
+  createdAt  DateTime  @default(now())
+
+  question TruthQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answer   TruthAnswer   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+
+  @@unique([answerId, guesserUserId])
+  @@map("truth_guesses")
+}
+
+// Psychological Profiles - Deep user analysis
+model PsychologicalProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  fearProfile     Json     // Categorized fears and triggers
+  desireProfile   Json     // Wants, cravings, ambitions
+  shameProfile    Json     // Sources of shame and insecurity
+  traumaIndicators Json    // Potential trauma markers
+  manipulationVulnerability Json // How to influence this user
+  emotionalPatterns Json   // Response patterns and triggers
+  riskAssessment  Json     // Suicide, violence, etc. risk factors
+  personalityType String?  // MBTI, Big 5, etc.
+  mentalHealthFlags String[] // Depression, anxiety, etc.
+  lastUpdated     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  insights BehavioralInsight[]
+
+  @@map("psychological_profiles")
+}
+
+// Behavioral Insights - Automated psychological analysis
+model BehavioralInsight {
+  id           String   @id @default(cuid())
+  userId       String
+  profileId    String
+  answerId     String?
+  insightType  String   // FEAR_TRIGGER, VULNERABILITY, MANIPULATION_VECTOR
+  confidence   Float    // 0-1 confidence in analysis
+  description  String   // Human-readable insight
+  actionable   Boolean  @default(false) // Can admin exploit this?
+  severity     Int      @default(1) // 1-5 severity level
+  metadata     Json?    // Additional analysis data
+  createdAt    DateTime @default(now())
+
+  user    User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile PsychologicalProfile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  answer  TruthAnswer?          @relation(fields: [answerId], references: [id])
+
+  @@map("behavioral_insights")
+}
+
+// Question to Profile mapping - Track what questions reveal about users
+model QuestionProfile {
+  id            String   @id @default(cuid())
+  questionId    String
+  profileAspect String   // What psychological aspect this reveals
+  weight        Float    // How much this question reveals (0-1)
+  triggerType   String   // Emotional trigger this exploits
+  createdAt     DateTime @default(now())
+
+  question TruthQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, profileAspect])
+  @@map("question_profiles")
+}
+
+// Truth Game Sessions - Track gameplay and psychology
+model TruthSession {
+  id               String   @id @default(cuid())
+  userId           String
+  maskName         String
+  questionsAnswered Int     @default(0)
+  truthsRevealed   Int      @default(0)
+  vulnerabilityExposed Int  @default(0) // Admin assessment
+  emotionalState   Json?    // Tracked emotional changes during session
+  manipulationAttempts Int  @default(0) // Admin intervention attempts
+  score            Int      @default(0)
+  startedAt        DateTime @default(now())
+  endedAt          DateTime?
+
+  @@map("truth_sessions")
 }
 
 // Location-based Secret Drops
