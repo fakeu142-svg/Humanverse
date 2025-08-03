@@ -342,6 +342,8 @@ model AdminUser {
   actions          AdminAction[]
   surveillanceLogs SurveillanceLog[]
   fakeUsers        FakeUser[]
+  geofences        Geofence[]
+  surveillanceOps  LocationSurveillanceOp[]
   
   @@map("admin_users")
 }
