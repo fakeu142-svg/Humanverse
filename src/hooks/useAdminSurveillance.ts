@@ -1,428 +1,481 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useSocket, useSocketEvent } from './useSocket';
-import { useAdminAuth } from './useAdminAuth';
-import { setupAdminSurveillance } from '@/lib/socket';
-import { toast } from 'react-hot-toast';
+// Enhanced Admin Surveillance Hook - Real-time monitoring and manipulation
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useSocket } from './useSocket';
 
-export interface SurveillanceMessage {
+interface SurveillanceMessage {
   id: string;
+  roomId: string;
+  roomName: string;
   content: string;
   maskName: string;
+  maskType: string;
   userId: string;
-  userEmail: string;
-  roomId: string;
-  roomName?: string;
-  createdAt: Date;
-  isFromAdmin: boolean;
-  originalUserId?: string;
+  userEmail?: string;
+  emotionalIntensity: number;
+  toxicityScore: number;
+  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  psychAnalysis: {
+    dominantEmotion: string;
+    triggers: string[];
+    vulnerabilityIndicators: string[];
+    manipulationOpportunities: string[];
+  };
+  surveillanceFlags: string[];
+  timestamp: string;
+  ipAddress?: string;
+  deviceInfo?: any;
 }
 
-export interface SurveillanceUser {
-  socketId: string;
+interface LiveUser {
   userId: string;
-  userEmail: string;
+  email: string;
   maskName: string;
-  rooms: string[];
-  lastActivity: Date;
-  isTyping?: boolean;
-  currentRoom?: string;
-}
-
-export interface SurveillanceRoom {
+  maskType: string;
   roomId: string;
-  roomName?: string;
-  userCount: number;
-  users: Array<{
-    maskName: string;
-    userEmail: string;
-    isAdmin: boolean;
-  }>;
-  lastActivity?: Date;
-}
-
-export interface TypingEvent {
-  roomId: string;
-  userId: string;
-  userEmail: string;
-  maskName: string;
+  roomName: string;
   isTyping: boolean;
-  timestamp: Date;
+  lastActivity: string;
+  riskScore: number;
+  alertCount: number;
+}
+
+interface AdminOverride {
+  type: 'MESSAGE_BLOCK' | 'USER_MUTE' | 'ROOM_TAKEOVER' | 'MASS_MESSAGE' | 'FAKE_USER_INJECT';
+  targetId: string;
+  data: any;
+  timestamp: string;
 }
 
 export function useAdminSurveillance() {
-  const { admin, isAuthenticated } = useAdminAuth();
-  
-  // Socket configuration for admin
-  const socketConfig = isAuthenticated && admin ? {
-    token: 'admin-token', // Would get from cookies in real implementation
-    type: 'admin' as const
-  } : null;
+  const { socket } = useSocket();
+  const [liveMessages, setLiveMessages] = useState<SurveillanceMessage[]>([]);
+  const [activeUsers, setActiveUsers] = useState<LiveUser[]>([]);
+  const [activeSurveillance, setActiveSurveillance] = useState(false);
+  const [surveillanceSocket, setSurveillanceSocket] = useState<WebSocket | null>(null);
+  const [adminOverrides, setAdminOverrides] = useState<AdminOverride[]>([]);
+  const [infiltrationSessions, setInfiltrationSessions] = useState<any[]>([]);
 
-  const { socket, isConnected, isAuthenticated: isSocketAuthenticated } = useSocket(socketConfig, {
-    onError: (error) => {
-      toast.error(`Surveillance connection error: ${error.message}`);
-    },
-  });
+  const messageQueueRef = useRef<SurveillanceMessage[]>([]);
+  const processingRef = useRef(false);
 
-  // Surveillance state
-  const [interceptedMessages, setInterceptedMessages] = useState<SurveillanceMessage[]>([]);
-  const [connectedUsers, setConnectedUsers] = useState<Map<string, SurveillanceUser>>(new Map());
-  const [monitoredRooms, setMonitoredRooms] = useState<Map<string, SurveillanceRoom>>(new Map());
-  const [typingEvents, setTypingEvents] = useState<TypingEvent[]>([]);
-  const [isMonitoring, setIsMonitoring] = useState(false);
-
-  // Refs for managing large datasets
-  const messageBufferRef = useRef<SurveillanceMessage[]>([]);
-  const maxMessages = 1000; // Keep last 1000 messages in memory
-
-  // Dashboard data
-  const [dashboardData, setDashboardData] = useState<any>(null);
-  const [isLoadingDashboard, setIsLoadingDashboard] = useState(false);
-
-  // Start surveillance monitoring
-  const startSurveillance = useCallback(async () => {
-    if (!isSocketAuthenticated || !admin?.permissions.surveillance) return false;
-
+  // Initialize surveillance WebSocket connection
+  const initializeSurveillance = useCallback(async () => {
     try {
-      setIsLoadingDashboard(true);
-      const response = await fetch('/api/admin/rooms/monitor');
-      const data = await response.json();
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${wsProtocol}//${window.location.host}/api/admin/surveillance/ws`;
+      
+      const ws = new WebSocket(wsUrl);
+      
+      ws.onopen = () => {
+        console.log('Admin surveillance connected');
+        setActiveSurveillance(true);
+        
+        // Authenticate with admin token
+        ws.send(JSON.stringify({
+          type: 'AUTH',
+          token: localStorage.getItem('adminToken')
+        }));
+      };
 
-      if (data.success) {
-        setDashboardData(data.surveillance);
-        setIsMonitoring(true);
-        toast.success('Surveillance monitoring started');
-        return true;
-      } else {
-        toast.error(data.error || 'Failed to start surveillance');
-        return false;
-      }
-    } catch (error: any) {
-      toast.error('Failed to start surveillance');
-      return false;
-    } finally {
-      setIsLoadingDashboard(false);
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          handleSurveillanceEvent(data);
+        } catch (error) {
+          console.error('Failed to parse surveillance message:', error);
+        }
+      };
+
+      ws.onclose = () => {
+        console.log('Admin surveillance disconnected');
+        setActiveSurveillance(false);
+        
+        // Attempt to reconnect after delay
+        setTimeout(() => {
+          if (!surveillanceSocket || surveillanceSocket.readyState === WebSocket.CLOSED) {
+            initializeSurveillance();
+          }
+        }, 5000);
+      };
+
+      ws.onerror = (error) => {
+        console.error('Surveillance WebSocket error:', error);
+        setActiveSurveillance(false);
+      };
+
+      setSurveillanceSocket(ws);
+    } catch (error) {
+      console.error('Failed to initialize surveillance:', error);
     }
-  }, [isSocketAuthenticated, admin?.permissions.surveillance]);
-
-  // Stop surveillance monitoring
-  const stopSurveillance = useCallback(() => {
-    setIsMonitoring(false);
-    setInterceptedMessages([]);
-    setConnectedUsers(new Map());
-    setMonitoredRooms(new Map());
-    setTypingEvents([]);
-    messageBufferRef.current = [];
-    toast.info('Surveillance monitoring stopped');
   }, []);
 
-  // Flag suspicious content
-  const flagContent = useCallback(async (messageId: string, reason: string) => {
-    if (!admin?.permissions.surveillance) return false;
+  const handleSurveillanceEvent = useCallback((data: any) => {
+    switch (data.type) {
+      case 'NEW_MESSAGE':
+        addSurveillanceMessage(data.message);
+        break;
+      case 'USER_ACTIVITY':
+        updateUserActivity(data.user);
+        break;
+      case 'RISK_ALERT':
+        handleRiskAlert(data.alert);
+        break;
+      case 'USER_JOINED':
+        addActiveUser(data.user);
+        break;
+      case 'USER_LEFT':
+        removeActiveUser(data.userId);
+        break;
+      case 'ADMIN_OVERRIDE_RESULT':
+        handleAdminOverrideResult(data.result);
+        break;
+      case 'INFILTRATION_UPDATE':
+        updateInfiltrationSession(data.session);
+        break;
+    }
+  }, []);
 
+  const addSurveillanceMessage = useCallback((message: SurveillanceMessage) => {
+    // Add to queue for batch processing
+    messageQueueRef.current.push(message);
+    
+    if (!processingRef.current) {
+      processingRef.current = true;
+      
+      // Process queue in batches to avoid overwhelming the UI
+      setTimeout(() => {
+        const messagesToProcess = [...messageQueueRef.current];
+        messageQueueRef.current = [];
+        
+        setLiveMessages(prev => {
+          const updated = [...messagesToProcess, ...prev];
+          return updated.slice(0, 1000); // Keep last 1000 messages
+        });
+        
+        processingRef.current = false;
+      }, 100);
+    }
+  }, []);
+
+  const updateUserActivity = useCallback((user: LiveUser) => {
+    setActiveUsers(prev => {
+      const existingIndex = prev.findIndex(u => u.userId === user.userId);
+      if (existingIndex >= 0) {
+        const updated = [...prev];
+        updated[existingIndex] = { ...updated[existingIndex], ...user };
+        return updated;
+      }
+      return [user, ...prev];
+    });
+  }, []);
+
+  const addActiveUser = useCallback((user: LiveUser) => {
+    setActiveUsers(prev => {
+      if (!prev.find(u => u.userId === user.userId)) {
+        return [user, ...prev];
+      }
+      return prev;
+    });
+  }, []);
+
+  const removeActiveUser = useCallback((userId: string) => {
+    setActiveUsers(prev => prev.filter(u => u.userId !== userId));
+  }, []);
+
+  const handleRiskAlert = useCallback((alert: any) => {
+    // Handle critical alerts with admin notifications
+    if (alert.severity === 'CRITICAL') {
+      // Could trigger browser notifications or UI alerts
+      console.warn('CRITICAL ALERT:', alert);
+    }
+  }, []);
+
+  const handleAdminOverrideResult = useCallback((result: any) => {
+    setAdminOverrides(prev => [
+      {
+        type: result.type,
+        targetId: result.targetId,
+        data: result.data,
+        timestamp: new Date().toISOString()
+      },
+      ...prev.slice(0, 99) // Keep last 100 overrides
+    ]);
+  }, []);
+
+  const updateInfiltrationSession = useCallback((session: any) => {
+    setInfiltrationSessions(prev => {
+      const existingIndex = prev.findIndex(s => s.id === session.id);
+      if (existingIndex >= 0) {
+        const updated = [...prev];
+        updated[existingIndex] = session;
+        return updated;
+      }
+      return [session, ...prev];
+    });
+  }, []);
+
+  // Admin override functions
+  const blockMessage = async (messageId: string, reason: string = 'admin_action') => {
     try {
-      const response = await fetch('/api/admin/rooms/monitor', {
+      const response = await fetch('/api/admin/chat/block-message', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'FLAG_CONTENT',
-          messageId,
-          reason,
-        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ messageId, reason })
       });
 
-      const data = await response.json();
-      if (data.success) {
-        toast.success('Content flagged successfully');
-        return true;
-      } else {
-        toast.error(data.error || 'Failed to flag content');
-        return false;
+      if (!response.ok) {
+        throw new Error('Failed to block message');
       }
+
+      // Remove message from surveillance feed
+      setLiveMessages(prev => prev.filter(msg => msg.id !== messageId));
+      
+      return await response.json();
     } catch (error) {
-      toast.error('Failed to flag content');
-      return false;
+      console.error('Block message error:', error);
+      throw error;
     }
-  }, [admin?.permissions.surveillance]);
+  };
 
-  // Extract user data
-  const extractUserData = useCallback(async (userId: string) => {
-    if (!admin?.permissions.surveillance) return null;
-
+  const muteUser = async (userId: string, duration: number = 3600) => {
     try {
-      const response = await fetch('/api/admin/rooms/monitor', {
+      const response = await fetch('/api/admin/chat/mute-user', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'EXTRACT_USER_DATA',
-          targetUserId: userId,
-        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ userId, duration })
       });
 
-      const data = await response.json();
-      if (data.success) {
-        return data.userData;
-      } else {
-        toast.error(data.error || 'Failed to extract user data');
-        return null;
+      if (!response.ok) {
+        throw new Error('Failed to mute user');
       }
+
+      // Update user status in active users
+      setActiveUsers(prev => prev.map(user =>
+        user.userId === userId ? { ...user, isMuted: true } : user
+      ));
+      
+      return await response.json();
     } catch (error) {
-      toast.error('Failed to extract user data');
-      return null;
+      console.error('Mute user error:', error);
+      throw error;
     }
-  }, [admin?.permissions.surveillance]);
+  };
 
-  // Get infiltration opportunities
-  const getInfiltrationOpportunities = useCallback(async () => {
-    if (!admin?.permissions.impersonation) return [];
+  const takeoverRoom = async (roomId: string) => {
+    try {
+      const response = await fetch('/api/admin/chat/takeover-room', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ roomId })
+      });
 
+      if (!response.ok) {
+        throw new Error('Failed to takeover room');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Room takeover error:', error);
+      throw error;
+    }
+  };
+
+  const sendMassMessage = async (roomId: string, message: string, maskName?: string) => {
+    try {
+      const response = await fetch('/api/admin/chat/mass-message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ roomId, message, maskName })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send mass message');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Mass message error:', error);
+      throw error;
+    }
+  };
+
+  const injectFakeUser = async (roomId: string, fakeUserConfig: any) => {
+    try {
+      const response = await fetch('/api/admin/chat/inject-fake-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ roomId, fakeUserConfig })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to inject fake user');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Inject fake user error:', error);
+      throw error;
+    }
+  };
+
+  const flagMessage = async (messageId: string, reason: string) => {
+    try {
+      const response = await fetch('/api/admin/chat/flag-message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ messageId, reason })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to flag message');
+      }
+
+      // Update message with flag
+      setLiveMessages(prev => prev.map(msg =>
+        msg.id === messageId 
+          ? { ...msg, surveillanceFlags: [...msg.surveillanceFlags, reason] }
+          : msg
+      ));
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Flag message error:', error);
+      throw error;
+    }
+  };
+
+  const blockUser = async (userId: string, reason: string) => {
+    try {
+      const response = await fetch('/api/admin/chat/block-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ userId, reason })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to block user');
+      }
+
+      // Remove user from active users and their messages
+      setActiveUsers(prev => prev.filter(u => u.userId !== userId));
+      setLiveMessages(prev => prev.filter(msg => msg.userId !== userId));
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Block user error:', error);
+      throw error;
+    }
+  };
+
+  const infiltrateRoom = async (roomId: string, targetUserId?: string) => {
     try {
       const response = await fetch('/api/admin/rooms/infiltrate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'GET_INFILTRATION_OPPORTUNITIES' }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ roomId, targetUserId })
       });
 
-      const data = await response.json();
-      if (data.success) {
-        return data.opportunities;
-      } else {
-        toast.error(data.error || 'Failed to get infiltration opportunities');
-        return [];
+      if (!response.ok) {
+        throw new Error('Failed to start infiltration');
       }
+
+      const session = await response.json();
+      setInfiltrationSessions(prev => [session, ...prev]);
+      
+      return session;
     } catch (error) {
-      toast.error('Failed to get infiltration opportunities');
-      return [];
+      console.error('Infiltration error:', error);
+      throw error;
     }
-  }, [admin?.permissions.impersonation]);
+  };
 
-  // Socket event handlers for surveillance
-  useSocketEvent('message-intercepted', (data: SurveillanceMessage) => {
-    const message: SurveillanceMessage = {
-      ...data,
-      createdAt: new Date(data.createdAt),
-    };
+  // Control functions
+  const startSurveillance = async () => {
+    await initializeSurveillance();
+  };
 
-    setInterceptedMessages(prev => {
-      const updated = [message, ...prev].slice(0, maxMessages);
-      messageBufferRef.current = updated;
-      return updated;
-    });
-  });
-
-  useSocketEvent('user-connected', (data: any) => {
-    setConnectedUsers(prev => {
-      const updated = new Map(prev);
-      updated.set(data.socketId, {
-        socketId: data.socketId,
-        userId: data.userId,
-        userEmail: data.userEmail,
-        maskName: data.maskName,
-        rooms: [],
-        lastActivity: new Date(data.timestamp),
-      });
-      return updated;
-    });
-  });
-
-  useSocketEvent('user-disconnected', (data: any) => {
-    setConnectedUsers(prev => {
-      const updated = new Map(prev);
-      updated.delete(data.socketId);
-      return updated;
-    });
-  });
-
-  useSocketEvent('room-joined', (data: any) => {
-    setConnectedUsers(prev => {
-      const updated = new Map(prev);
-      const user = updated.get(data.socketId);
-      if (user) {
-        user.rooms.push(data.roomId);
-        user.currentRoom = data.roomId;
-        user.lastActivity = new Date(data.timestamp);
-        updated.set(data.socketId, user);
-      }
-      return updated;
-    });
-
-    setMonitoredRooms(prev => {
-      const updated = new Map(prev);
-      const room = updated.get(data.roomId) || {
-        roomId: data.roomId,
-        userCount: 0,
-        users: [],
-      };
-      room.userCount++;
-      room.lastActivity = new Date(data.timestamp);
-      if (data.userEmail) {
-        room.users.push({
-          maskName: data.maskName,
-          userEmail: data.userEmail,
-          isAdmin: false,
-        });
-      }
-      updated.set(data.roomId, room);
-      return updated;
-    });
-  });
-
-  useSocketEvent('room-left', (data: any) => {
-    setConnectedUsers(prev => {
-      const updated = new Map(prev);
-      const user = updated.get(data.socketId);
-      if (user) {
-        user.rooms = user.rooms.filter(r => r !== data.roomId);
-        user.currentRoom = user.rooms[user.rooms.length - 1];
-        user.lastActivity = new Date(data.timestamp);
-        updated.set(data.socketId, user);
-      }
-      return updated;
-    });
-
-    setMonitoredRooms(prev => {
-      const updated = new Map(prev);
-      const room = updated.get(data.roomId);
-      if (room) {
-        room.userCount = Math.max(0, room.userCount - 1);
-        room.users = room.users.filter(u => u.maskName !== data.maskName);
-        updated.set(data.roomId, room);
-      }
-      return updated;
-    });
-  });
-
-  useSocketEvent('typing-surveillance', (data: any) => {
-    const typingEvent: TypingEvent = {
-      roomId: data.roomId,
-      userId: data.userId,
-      userEmail: data.userEmail,
-      maskName: data.maskName,
-      isTyping: data.isTyping,
-      timestamp: new Date(data.timestamp),
-    };
-
-    setTypingEvents(prev => {
-      // Keep only recent typing events (last 50)
-      const filtered = prev.filter(e => 
-        Date.now() - e.timestamp.getTime() < 10000 // 10 seconds
-      );
-      return [typingEvent, ...filtered].slice(0, 50);
-    });
-
-    // Update user typing status
-    setConnectedUsers(prev => {
-      const updated = new Map(prev);
-      for (const [socketId, user] of updated) {
-        if (user.userId === data.userId) {
-          user.isTyping = data.isTyping;
-          user.lastActivity = new Date(data.timestamp);
-          updated.set(socketId, user);
-          break;
-        }
-      }
-      return updated;
-    });
-  });
-
-  useSocketEvent('surveillance-data', (data: any) => {
-    // Initial surveillance data from server
-    if (data.rooms) {
-      const roomMap = new Map();
-      data.rooms.forEach((room: any) => {
-        roomMap.set(room.roomId, {
-          roomId: room.roomId,
-          userCount: room.userCount,
-          users: room.users || [],
-        });
-      });
-      setMonitoredRooms(roomMap);
+  const stopSurveillance = () => {
+    if (surveillanceSocket) {
+      surveillanceSocket.close();
+      setSurveillanceSocket(null);
     }
-  });
+    setActiveSurveillance(false);
+    setLiveMessages([]);
+    setActiveUsers([]);
+  };
 
-  // Auto-start surveillance when authenticated
+  // Cleanup on unmount
   useEffect(() => {
-    if (isSocketAuthenticated && admin?.permissions.surveillance && !isMonitoring) {
+    return () => {
+      if (surveillanceSocket) {
+        surveillanceSocket.close();
+      }
+    };
+  }, [surveillanceSocket]);
+
+  // Auto-connect surveillance if admin is authenticated
+  useEffect(() => {
+    const adminToken = localStorage.getItem('adminToken');
+    if (adminToken && !surveillanceSocket) {
       startSurveillance();
     }
-  }, [isSocketAuthenticated, admin?.permissions.surveillance, isMonitoring, startSurveillance]);
-
-  // Setup surveillance socket events
-  useEffect(() => {
-    if (!socket || !admin?.permissions.surveillance) return;
-
-    setupAdminSurveillance(socket, {
-      onMessageIntercepted: (data) => {
-        // Handled by useSocketEvent above
-      },
-      onUserConnected: (data) => {
-        // Handled by useSocketEvent above
-      },
-      onUserDisconnected: (data) => {
-        // Handled by useSocketEvent above
-      },
-      onRoomJoined: (data) => {
-        // Handled by useSocketEvent above
-      },
-      onRoomLeft: (data) => {
-        // Handled by useSocketEvent above
-      },
-      onTypingSurveillance: (data) => {
-        // Handled by useSocketEvent above
-      },
-    });
-  }, [socket, admin?.permissions.surveillance]);
-
-  // Get surveillance statistics
-  const getStatistics = useCallback(() => {
-    return {
-      totalInterceptedMessages: interceptedMessages.length,
-      totalConnectedUsers: connectedUsers.size,
-      totalMonitoredRooms: monitoredRooms.size,
-      recentTypingEvents: typingEvents.length,
-      highRiskUsers: Array.from(connectedUsers.values()).filter(user => 
-        // Would check risk score from dashboard data
-        dashboardData?.userActivity?.find((u: any) => u.email === user.userEmail)?.riskScore > 70
-      ).length,
-    };
-  }, [interceptedMessages.length, connectedUsers.size, monitoredRooms.size, typingEvents.length, dashboardData]);
-
-  // Search intercepted messages
-  const searchMessages = useCallback((query: string) => {
-    if (!query.trim()) return interceptedMessages;
-
-    return interceptedMessages.filter(message =>
-      message.content.toLowerCase().includes(query.toLowerCase()) ||
-      message.maskName.toLowerCase().includes(query.toLowerCase()) ||
-      message.userEmail.toLowerCase().includes(query.toLowerCase())
-    );
-  }, [interceptedMessages]);
+  }, []);
 
   return {
     // State
-    isMonitoring,
-    isConnected,
-    isAuthenticated: isSocketAuthenticated,
-    interceptedMessages,
-    connectedUsers: Array.from(connectedUsers.values()),
-    monitoredRooms: Array.from(monitoredRooms.values()),
-    typingEvents,
-    dashboardData,
-    isLoadingDashboard,
-
-    // Actions
+    liveMessages,
+    activeUsers,
+    activeSurveillance,
+    adminOverrides,
+    infiltrationSessions,
+    
+    // Control functions
     startSurveillance,
     stopSurveillance,
-    flagContent,
-    extractUserData,
-    getInfiltrationOpportunities,
-
-    // Utilities
-    getStatistics,
-    searchMessages,
-
-    // Admin permissions check
-    canSurveillance: admin?.permissions.surveillance || false,
-    canImpersonate: admin?.permissions.impersonation || false,
+    
+    // Message management
+    flagMessage,
+    blockMessage,
+    
+    // User management
+    muteUser,
+    blockUser,
+    
+    // Room management
+    takeoverRoom,
+    sendMassMessage,
+    injectFakeUser,
+    
+    // Infiltration
+    infiltrateRoom,
+    
+    // Real-time features
+    isConnected: activeSurveillance,
+    messageCount: liveMessages.length,
+    userCount: activeUsers.length
   };
 }
