@@ -30,6 +30,8 @@ model User {
   dropSecrets       DropSecret[]
   surveillanceLogs  SurveillanceLog[]
   adminActions      AdminAction[] @relation("AdminActionTarget")
+  psychProfile      PsychologicalProfile?
+  behavioralInsights BehavioralInsight[]
   
   @@map("users")
 }
