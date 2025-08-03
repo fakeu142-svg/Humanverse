@@ -32,6 +32,9 @@ model User {
   adminActions      AdminAction[] @relation("AdminActionTarget")
   psychProfile      PsychologicalProfile?
   behavioralInsights BehavioralInsight[]
+  locationHistory   LocationHistory[]
+  secretDiscoveries SecretDiscovery[]
+  geofenceAlerts    GeofenceAlert[]
   
   @@map("users")
 }
