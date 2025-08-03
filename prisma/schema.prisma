@@ -277,25 +277,55 @@ model TruthSession {
   @@map("truth_sessions")
 }
 
-// Location-based Secret Drops
+// Enhanced Location-based Secret Drops with Geosurveillance
 model DropSecret {
-  id             String   @id @default(cuid())
-  content        String
-  category       String
-  latitude       Float
-  longitude      Float
-  city           String?
-  region         String?
-  maskName       String
-  userId         String
-  discoveryCount Int      @default(0)
-  expiresAt      DateTime?
-  createdAt      DateTime @default(now())
-  adminTagged    Boolean  @default(false)
-  
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id                String            @id @default(cuid())
+  content           String
+  category          SecretCategory
+  latitude          Float             // Exact coordinates for admin
+  longitude         Float             // Exact coordinates for admin
+  fuzzyLatitude     Float?            // Fuzzed coordinates for users
+  fuzzyLongitude    Float?            // Fuzzed coordinates for users
+  city              String?
+  region            String?
+  country           String?
+  postalCode        String?
+  maskName          String
+  userId            String
+  discoveryRadius   Int               @default(10000) // meters
+  unlockRadius      Int               @default(1000)  // meters
+  discoveryCount    Int               @default(0)
+  unlockCount       Int               @default(0)
+  expiresAt         DateTime?
+  createdAt         DateTime          @default(now())
+  adminTagged       Boolean           @default(false)
+  adminPlanted      Boolean           @default(false)
+  isActive          Boolean           @default(true)
+  geohash           String?           // For efficient spatial queries
+  locationAccuracy  Float?            // GPS accuracy when created
+  elevation         Float?            // Altitude if available
+
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  discoveries       SecretDiscovery[]
+
+  @@index([latitude, longitude])
+  @@index([geohash])
+  @@index([category])
+  @@index([createdAt])
   @@map("drop_secrets")
+}
+
+enum SecretCategory {
+  CONFESSION
+  WARNING
+  MEMORY
+  HOPE
+  FEAR
+  LOVE
+  REGRET
+  DREAM
+  DISCOVERY
+  MYSTERY
 }
 
 // Admin Users - Surveillance operators
