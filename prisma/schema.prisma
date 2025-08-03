@@ -394,8 +394,158 @@ model FakeUser {
   isActive        Boolean  @default(true)
   roomsJoined     Json?    // Array of room IDs
   createdAt       DateTime @default(now())
-  
+
   admin AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
-  
+
   @@map("fake_users")
+}
+
+// User Location History - Complete movement tracking
+model LocationHistory {
+  id              String   @id @default(cuid())
+  userId          String
+  latitude        Float
+  longitude       Float
+  accuracy        Float?   // GPS accuracy in meters
+  altitude        Float?   // Elevation if available
+  speed           Float?   // Movement speed if available
+  heading         Float?   // Direction of movement
+  timestamp       DateTime @default(now())
+  sessionId       String?  // Link to user session
+  activityType    String?  // WALKING, DRIVING, STATIONARY, etc.
+  city            String?
+  region          String?
+  country         String?
+  postalCode      String?
+  geohash         String?  // For efficient spatial queries
+  ipAddress       String?
+  deviceInfo      Json?    // Device and browser info
+
+  // Admin surveillance data
+  surveillanceType String? // PASSIVE, ACTIVE, GEOFENCE_TRIGGER
+  adminTriggered   Boolean @default(false)
+  isManualOverride Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, timestamp])
+  @@index([latitude, longitude])
+  @@index([geohash])
+  @@index([sessionId])
+  @@map("location_history")
+}
+
+// Secret Discovery Tracking
+model SecretDiscovery {
+  id            String    @id @default(cuid())
+  userId        String
+  secretId      String
+  discoveredAt  DateTime  @default(now())
+  unlockedAt    DateTime?
+  userLatitude  Float     // User's location when discovered
+  userLongitude Float     // User's location when discovered
+  distance      Float     // Distance from secret when discovered
+  maskName      String
+
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  secret DropSecret @relation(fields: [secretId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, secretId])
+  @@index([discoveredAt])
+  @@map("secret_discoveries")
+}
+
+// Admin Geofencing System
+model Geofence {
+  id                String           @id @default(cuid())
+  name              String
+  description       String?
+  adminId           String
+  centerLatitude    Float
+  centerLongitude   Float
+  radius            Float            // In meters
+  shape             GeofenceShape    @default(CIRCLE)
+  isActive          Boolean          @default(true)
+  alertType         GeofenceAlert    @default(ENTRY)
+  surveillanceLevel SurveillanceLevel @default(MEDIUM)
+  createdAt         DateTime         @default(now())
+
+  admin  AdminUser       @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  alerts GeofenceAlert[]
+
+  @@map("geofences")
+}
+
+enum GeofenceShape {
+  CIRCLE
+  POLYGON
+  RECTANGLE
+}
+
+enum GeofenceAlertType {
+  ENTRY
+  EXIT
+  BOTH
+  DWELL
+}
+
+enum SurveillanceLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// Geofence Alert Events
+model GeofenceAlert {
+  id           String    @id @default(cuid())
+  userId       String
+  geofenceId   String
+  alertType    String    // ENTRY, EXIT, DWELL
+  latitude     Float
+  longitude    Float
+  triggeredAt  DateTime  @default(now())
+  acknowledged Boolean   @default(false)
+  severity     String    @default("MEDIUM")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  geofence Geofence @relation(fields: [geofenceId], references: [id], onDelete: Cascade)
+
+  @@index([triggeredAt])
+  @@index([acknowledged])
+  @@map("geofence_alerts")
+}
+
+// Location-based User Analytics
+model LocationAnalytics {
+  id                String   @id @default(cuid())
+  userId            String
+  analysisDate      DateTime @default(now())
+  homeLocation      Json?    // Predicted home coordinates
+  workLocation      Json?    // Predicted work coordinates
+  frequentLocations Json     // Array of commonly visited places
+  movementPatterns  Json     // Travel patterns and timing
+  riskAssessment    Json     // Location-based risk scoring
+  predictedRoutes   Json?    // AI-predicted future movements
+  socialConnections Json?    // Location correlation with other users
+
+  @@unique([userId, analysisDate])
+  @@map("location_analytics")
+}
+
+// Admin Location Surveillance Operations
+model LocationSurveillanceOp {
+  id            String   @id @default(cuid())
+  adminId       String
+  operationType String   // TRACK_USER, GEOFENCE_ALERT, LOCATION_CORRELATION
+  targetUserId  String?
+  parameters    Json     // Operation-specific parameters
+  startedAt     DateTime @default(now())
+  endedAt       DateTime?
+  status        String   @default("ACTIVE") // ACTIVE, PAUSED, COMPLETED
+  results       Json?    // Operation results and findings
+
+  admin AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@map("location_surveillance_ops")
 }
