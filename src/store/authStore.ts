@@ -174,7 +174,7 @@ export const useAuthStore = create<AuthStore>()(
         try {
           set({ isLoading: true });
 
-          await fetch('/api/auth/logout', {
+          await safeFetch('/api/auth/logout', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
