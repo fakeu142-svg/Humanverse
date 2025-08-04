@@ -212,6 +212,19 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       checkAuth: async () => {
+        // Global auth disable flag
+        if (AUTH_DISABLED) {
+          console.log('Auth functionality disabled globally');
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            isCheckingAuth: false,
+            error: null
+          });
+          return;
+        }
+
         try {
           // Skip auth check if running in demo environment or if backend unavailable
           const isDemo = typeof window !== 'undefined' && (
