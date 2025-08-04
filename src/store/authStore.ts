@@ -39,6 +39,7 @@ export const useAuthStore = create<AuthStore>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      isCheckingAuth: false,
 
       // Actions
       setUser: (user) => {
