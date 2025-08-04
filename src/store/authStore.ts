@@ -4,12 +4,14 @@ import { persist } from 'zustand/middleware';
 // Safe fetch wrapper to prevent analytics interference
 const safeFetch = async (url: string, options?: RequestInit) => {
   try {
-    // Use the original fetch if available, or current implementation
-    const fetchFn = (globalThis as any).__originalFetch || fetch;
+    // Use protected fetch to avoid third-party interference
+    const fetchFn = (typeof window !== 'undefined' && (window as any).__protectedFetch) ||
+                   (globalThis as any).__originalFetch ||
+                   fetch;
     return await fetchFn(url, options);
   } catch (error: any) {
     console.warn('Fetch failed, likely in demo environment:', error.message);
-    // Return a mock failed response
+    // Return a mock failed response to prevent errors
     return {
       ok: false,
       status: 503,
@@ -17,6 +19,13 @@ const safeFetch = async (url: string, options?: RequestInit) => {
       json: () => Promise.resolve({ error: 'Service unavailable in demo mode' }),
       text: () => Promise.resolve(''),
       headers: new Headers(),
+      redirected: false,
+      type: 'basic' as ResponseType,
+      url: url,
+      clone: function() { return this; },
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+      blob: () => Promise.resolve(new Blob()),
+      formData: () => Promise.resolve(new FormData()),
     };
   }
 };
