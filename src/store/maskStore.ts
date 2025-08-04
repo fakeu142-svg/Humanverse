@@ -359,6 +359,7 @@ export function useMaskSelection() {
     selectMaskType,
     confirmSelection,
     getMaskTypeInfo,
+    loadAvailableMasks,
     isLoading,
     error,
     clearError,
