@@ -18,23 +18,8 @@ export default function ExplorePage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-6">🔒</div>
-          <h2 className="text-2xl font-bold text-red-400 mb-4">Access Required</h2>
-          <p className="text-gray-400 mb-6">Please log in to explore the Humanverse</p>
-          <a
-            href="/login"
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors inline-block"
-          >
-            Log In
-          </a>
-        </div>
-      </div>
-    );
-  }
+  // Show demo content for unauthenticated users
+  const isDemo = !user;
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
