@@ -23,7 +23,9 @@ export default function RootLayout({
     <html lang="en" className="scrollbar-desert">
       <body className={`${inter.className} min-h-screen bg-desert-900 text-desert-100`}>
         <div className="min-h-screen flex flex-col">
-          {children}
+          <ConditionalLayout>
+            {children}
+          </ConditionalLayout>
         </div>
         <Toaster
           position="top-right"
