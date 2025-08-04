@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAdminSurveillance } from '@/hooks/useAdminSurveillance';
-import { AdminGuard } from '@/components/admin/AdminGuard';
+import AdminGuard from '@/components/admin/AdminGuard';
 import { 
   UserPlusIcon,
   UserIcon,
