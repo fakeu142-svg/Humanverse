@@ -15,6 +15,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  isCheckingAuth: boolean;
 }
 
 interface AuthActions {
