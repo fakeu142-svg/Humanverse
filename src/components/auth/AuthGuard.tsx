@@ -20,7 +20,10 @@ export function AuthGuard({
   const { isAuthenticated, user, checkAuth, isLoading } = useAuthStore();
 
   useEffect(() => {
-    checkAuth();
+    // Skip auth check in development to prevent fetch errors
+    if (process.env.NODE_ENV !== 'development') {
+      checkAuth();
+    }
   }, [checkAuth]);
 
   // Show loading state
