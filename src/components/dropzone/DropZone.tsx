@@ -45,32 +45,101 @@ export function DropZone() {
   const [view, setView] = useState<'map' | 'list'>('map');
 
   useEffect(() => {
-    if (user) {
-      requestLocation();
+    requestLocation();
+  }, []);
+
+  const getDemoLocation = (): LocationData => ({
+    latitude: 37.7749,
+    longitude: -122.4194,
+    accuracy: 20,
+    city: 'San Francisco',
+    region: 'California',
+    country: 'United States'
+  });
+
+  const getDemoSecrets = (userLat: number, userLng: number): DropSecret[] => [
+    {
+      id: 'demo-secret-1',
+      title: 'Lost Love Letter',
+      category: 'Romance',
+      distance: 0.2,
+      canUnlock: true,
+      isUnlocked: false,
+      content: 'I never told you how much that summer meant to me. Every sunset reminded me of your smile, and every wave whispered your name. If you\'re reading this, know that some feelings never fade, they just find new places to hide.',
+      createdAt: new Date('2024-01-15'),
+      location: {
+        fuzzyLatitude: userLat + 0.001,
+        fuzzyLongitude: userLng + 0.001,
+        city: 'San Francisco',
+        region: 'California'
+      }
+    },
+    {
+      id: 'demo-secret-2',
+      title: 'Career Confession',
+      category: 'Career',
+      distance: 0.5,
+      canUnlock: true,
+      isUnlocked: false,
+      content: 'I quit my dream job today. Everyone thinks I\'m crazy, but staying would have killed the part of me that still believes in magic. Sometimes the scariest decision is the right one.',
+      createdAt: new Date('2024-01-20'),
+      location: {
+        fuzzyLatitude: userLat + 0.003,
+        fuzzyLongitude: userLng - 0.002,
+        city: 'San Francisco',
+        region: 'California'
+      }
+    },
+    {
+      id: 'demo-secret-3',
+      title: 'Family Truth',
+      category: 'Family',
+      distance: 1.2,
+      canUnlock: false,
+      isUnlocked: false,
+      content: undefined,
+      createdAt: new Date('2024-01-18'),
+      location: {
+        fuzzyLatitude: userLat + 0.008,
+        fuzzyLongitude: userLng + 0.005,
+        city: 'San Francisco',
+        region: 'California'
+      }
+    },
+    {
+      id: 'demo-secret-4',
+      title: 'Midnight Revelation',
+      category: 'Personal',
+      distance: 0.8,
+      canUnlock: true,
+      isUnlocked: true,
+      content: 'At 3 AM, when the world is silent, I finally admitted to myself what I\'ve known for years. I\'m not the person I pretend to be during the day. The real me only comes alive in the darkness.',
+      unlockedAt: new Date(),
+      createdAt: new Date('2024-01-22'),
+      location: {
+        fuzzyLatitude: userLat - 0.004,
+        fuzzyLongitude: userLng + 0.003,
+        city: 'San Francisco',
+        region: 'California'
+      }
     }
-  }, [user]);
+  ];
 
   const requestLocation = async () => {
     try {
       setLoading(true);
       setError(null);
-      
-      const location = await getCurrentLocation(true);
+
+      console.log('Using demo location for DropZone');
+
+      // Use demo location
+      const location = getDemoLocation();
       setCurrentLocation(location);
-      
+
       await loadNearbySecrets(location.latitude, location.longitude);
     } catch (err: any) {
       console.error('Location error:', err);
       setError(err.message || 'Failed to get location');
-      
-      // Try with lower accuracy as fallback
-      try {
-        const location = await getCurrentLocation(false);
-        setCurrentLocation(location);
-        await loadNearbySecrets(location.latitude, location.longitude);
-      } catch (fallbackErr: any) {
-        setError('Location access denied or unavailable');
-      }
     } finally {
       setLoading(false);
     }
@@ -78,18 +147,15 @@ export function DropZone() {
 
   const loadNearbySecrets = async (latitude: number, longitude: number) => {
     try {
-      const response = await fetch('/api/dropzone/nearby', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ latitude, longitude, radius: 10000 }) // 10km radius
-      });
+      console.log('Loading demo secrets for DropZone');
 
-      if (!response.ok) {
-        throw new Error('Failed to load nearby secrets');
-      }
+      // Use demo secrets
+      const demoSecrets = getDemoSecrets(latitude, longitude);
 
-      const data = await response.json();
-      setNearbySecrets(data.secrets || []);
+      setTimeout(() => {
+        setNearbySecrets(demoSecrets);
+      }, 500);
+
     } catch (err: any) {
       console.error('Error loading nearby secrets:', err);
       setError('Failed to load nearby secrets');
