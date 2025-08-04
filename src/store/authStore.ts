@@ -187,8 +187,9 @@ export const useAuthStore = create<AuthStore>()(
           return;
         }
 
-        // Skip auth check entirely during development if window isn't ready
-        if (process.env.NODE_ENV === 'development' && typeof window === 'undefined') {
+        // Skip auth check entirely if running on server or window isn't ready
+        if (typeof window === 'undefined') {
+          set({ isLoading: false, isCheckingAuth: false });
           return;
         }
 
