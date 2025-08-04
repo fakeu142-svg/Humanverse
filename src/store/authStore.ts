@@ -252,7 +252,7 @@ export const useAuthStore = create<AuthStore>()(
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
-          const response = await fetch('/api/auth/me', {
+          const response = await safeFetch('/api/auth/me', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
