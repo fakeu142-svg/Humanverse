@@ -143,53 +143,35 @@ export const useMaskStore = create<MaskStore>()(
       },
 
       renewMask: async () => {
-        try {
-          const { currentMask } = get();
-          if (!currentMask) {
-            throw new Error('No active mask to renew');
-          }
-
-          set({ isLoading: true, error: null });
-
-          const response = await fetch('/api/masks/renew', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ maskId: currentMask.id }),
-          });
-
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || 'Failed to renew mask');
-          }
-
-          if (data.success && data.mask) {
-            const renewedMask: CurrentMask = {
-              ...currentMask,
-              expiresAt: data.mask.expiresAt ? new Date(data.mask.expiresAt) : null,
-              streakCount: data.mask.streakCount,
-              timeRemaining: data.mask.timeRemaining,
-            };
-
-            set({
-              currentMask: renewedMask,
-              isLoading: false,
-              error: null,
-            });
-
-            return true;
-          }
-
-          throw new Error('Invalid response from server');
-        } catch (error: any) {
+        const { currentMask } = get();
+        if (!currentMask) {
           set({
             isLoading: false,
-            error: error.message || 'Failed to renew mask',
+            error: 'No active mask to renew',
           });
           return false;
         }
+
+        console.log('Renewing demo mask');
+        set({ isLoading: true, error: null });
+
+        // Simulate async renewal
+        setTimeout(() => {
+          const renewedMask: CurrentMask = {
+            ...currentMask,
+            expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000), // 48 hours from now
+            streakCount: currentMask.streakCount + 1,
+            timeRemaining: 48 * 60 * 60 * 1000, // 48 hours in milliseconds
+          };
+
+          set({
+            currentMask: renewedMask,
+            isLoading: false,
+            error: null,
+          });
+        }, 500);
+
+        return true;
       },
 
       loadAvailableMasks: async () => {
