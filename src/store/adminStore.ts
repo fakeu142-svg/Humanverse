@@ -80,54 +80,15 @@ export const useAdminStore = create<AdminStore>()(
       },
 
       login: async (email: string, password: string) => {
-        try {
-          set({ isLoading: true, error: null });
-
-          const response = await fetch('/api/admin/auth', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-              email, 
-              password, 
-              action: 'login' 
-            }),
-          });
-
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || 'Admin login failed');
-          }
-
-          if (data.success && data.admin) {
-            const sessionExpiry = new Date(Date.now() + parseInt(process.env.NEXT_PUBLIC_ADMIN_SESSION_TIMEOUT || '3600') * 1000);
-            
-            set({
-              admin: {
-                ...data.admin,
-                lastLogin: data.admin.lastLogin ? new Date(data.admin.lastLogin) : null,
-              },
-              isAuthenticated: true,
-              isLoading: false,
-              error: null,
-              sessionExpiry,
-            });
-            return true;
-          }
-
-          throw new Error('Invalid response from server');
-        } catch (error: any) {
-          set({
-            admin: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: error.message || 'Admin login failed',
-            sessionExpiry: null,
-          });
-          return false;
-        }
+        console.log('Admin login disabled in demo mode');
+        set({
+          admin: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: 'Admin login not available in demo mode',
+          sessionExpiry: null,
+        });
+        return false;
       },
 
       logout: async () => {
