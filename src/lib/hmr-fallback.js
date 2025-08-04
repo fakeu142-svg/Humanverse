@@ -33,7 +33,8 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
         url.includes('hot-update') ||
         (url.includes('/api/auth/') && error.message?.includes('Failed to fetch'))
       )) {
-        console.warn('HMR fetch failed, continuing without hot reload:', error.message);
+        const isAuthAPI = url.includes('/api/auth/');
+        console.warn(isAuthAPI ? 'Auth API fetch failed during development, continuing:' : 'HMR fetch failed, continuing without hot reload:', error.message);
 
         // Return a mock response to prevent breaking the app
         return Promise.resolve({
