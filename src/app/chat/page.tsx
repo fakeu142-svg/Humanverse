@@ -30,23 +30,88 @@ export default function ChatRoomsPage() {
   const [showCreateRoom, setShowCreateRoom] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      loadRooms();
+    loadRooms();
+  }, []);
+
+  const getDemoRooms = (): ChatRoom[] => [
+    {
+      id: 'demo-room-1',
+      name: 'Midnight Confessions',
+      description: 'When the world sleeps, truth awakens. Share what you cannot say in daylight.',
+      type: 'PUBLIC',
+      isActive: true,
+      maxUsers: 50,
+      currentUsers: 12,
+      adminMonitored: false,
+      createdAt: '2024-01-15T00:00:00Z',
+      lastActivity: '2024-01-25T02:30:00Z',
+      tags: ['deep', 'anonymous', 'confessions']
+    },
+    {
+      id: 'demo-room-2',
+      name: 'Truth Seekers Circle',
+      description: 'Where masks come off and authentic connections begin.',
+      type: 'TRUTH_GAME',
+      isActive: true,
+      maxUsers: 20,
+      currentUsers: 8,
+      adminMonitored: true,
+      createdAt: '2024-01-18T12:00:00Z',
+      lastActivity: '2024-01-25T01:45:00Z',
+      tags: ['truth-game', 'vulnerability', 'growth']
+    },
+    {
+      id: 'demo-room-3',
+      name: 'Secret Drops Discussion',
+      description: 'Discuss the secrets you\'ve found and the mysteries that intrigue you.',
+      type: 'DROP_ZONE',
+      isActive: true,
+      maxUsers: 30,
+      currentUsers: 15,
+      adminMonitored: false,
+      createdAt: '2024-01-20T09:00:00Z',
+      lastActivity: '2024-01-25T03:15:00Z',
+      tags: ['dropzone', 'secrets', 'exploration']
+    },
+    {
+      id: 'demo-room-4',
+      name: 'The Void Speaks',
+      description: 'For those who dance between realities and embrace the unknown.',
+      type: 'PUBLIC',
+      isActive: true,
+      maxUsers: 25,
+      currentUsers: 6,
+      adminMonitored: false,
+      createdAt: '2024-01-22T18:00:00Z',
+      lastActivity: '2024-01-25T00:20:00Z',
+      tags: ['void', 'philosophy', 'transcendence']
+    },
+    {
+      id: 'demo-room-5',
+      name: 'Admin Observatory',
+      description: 'Monitored space for experimental conversations and behavioral analysis.',
+      type: 'ADMIN_CONTROLLED',
+      isActive: true,
+      maxUsers: 15,
+      currentUsers: 3,
+      adminMonitored: true,
+      createdAt: '2024-01-10T10:00:00Z',
+      lastActivity: '2024-01-24T22:00:00Z',
+      tags: ['admin', 'monitored', 'experimental']
     }
-  }, [user]);
+  ];
 
   const loadRooms = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/rooms/list', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      console.log('Loading demo chat rooms');
 
-      if (!response.ok) {
-        throw new Error('Failed to load rooms');
-      }
+      // Simulate loading delay
+      setTimeout(() => {
+        const demoRooms = getDemoRooms();
+        setRooms(demoRooms);
+        setLoading(false);
+      }, 500);
 
       const data = await response.json();
       setRooms(data.rooms);
