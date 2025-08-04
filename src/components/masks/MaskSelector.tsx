@@ -28,6 +28,7 @@ export default function MaskSelector({
     selectMaskType,
     confirmSelection,
     getMaskTypeInfo,
+    loadAvailableMasks,
     isLoading,
     error,
     clearError,
