@@ -273,7 +273,7 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
                   >
                     Logout
                   </button>
-                ) : (
+                ) : mounted ? (
                   <Link
                     href="/login"
                     className="block w-full text-left px-3 py-2 text-base font-medium text-blue-400 hover:text-blue-300 hover:bg-blue-600/10 rounded-md transition-colors"
@@ -281,7 +281,7 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
                   >
                     Login
                   </Link>
-                )}
+                ) : null}
               </div>
             </div>
           </motion.div>
