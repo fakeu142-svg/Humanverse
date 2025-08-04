@@ -37,7 +37,7 @@ export default function MaskSelector({
 
   useEffect(() => {
     // Load available masks when component mounts
-    const { loadAvailableMasks } = useMaskSelection.getState();
+    const { loadAvailableMasks } = useMaskStore.getState();
     loadAvailableMasks();
   }, []);
 
