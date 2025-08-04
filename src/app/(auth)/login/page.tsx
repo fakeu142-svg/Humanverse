@@ -10,14 +10,8 @@ export default function LoginPage() {
   const { isAuthenticated, checkAuth } = useAuthStore();
 
   useEffect(() => {
-    // Check if user is already authenticated (skip in demo)
-    const isDemo = window.location.hostname.includes('fly.dev') ||
-                  window.location.hostname.includes('localhost') ||
-                  process.env.NODE_ENV === 'development';
-
-    if (!isDemo) {
-      checkAuth();
-    }
+    // Auth checks completely disabled in demo mode
+    console.log('Login page: Auth checks disabled');
   }, [checkAuth]);
 
   useEffect(() => {
