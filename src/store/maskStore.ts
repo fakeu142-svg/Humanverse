@@ -98,55 +98,48 @@ export const useMaskStore = create<MaskStore>()(
       },
 
       createMask: async (maskType: MaskType) => {
-        try {
-          set({ isLoading: true, error: null });
+        console.log(`Creating demo mask of type: ${maskType}`);
+        set({ isLoading: true, error: null });
 
-          const response = await fetch('/api/masks/create', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ maskType }),
-          });
+        // Simulate async creation
+        setTimeout(() => {
+          const { availableMaskTypes } = get();
+          const maskTypeInfo = availableMaskTypes.find(mask => mask.type === maskType);
 
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || 'Failed to create mask');
-          }
-
-          if (data.success && data.mask) {
-            const newMask: CurrentMask = {
-              id: data.mask.id,
-              name: data.mask.name,
-              type: data.mask.type,
-              colorScheme: data.mask.colorScheme,
-              expiresAt: data.mask.expiresAt ? new Date(data.mask.expiresAt) : null,
-              streakCount: data.mask.streakCount,
-              timeRemaining: data.mask.expiresAt 
-                ? Math.max(0, new Date(data.mask.expiresAt).getTime() - Date.now())
-                : null,
-            };
-
+          if (!maskTypeInfo) {
             set({
-              currentMask: newMask,
-              selectedMaskType: null,
               isLoading: false,
-              error: null,
+              error: 'Invalid mask type',
             });
-
-            get().addToHistory(newMask);
-            return true;
+            return false;
           }
 
-          throw new Error('Invalid response from server');
-        } catch (error: any) {
+          const newMask: CurrentMask = {
+            id: `demo-mask-${Date.now()}`,
+            name: maskTypeInfo.name,
+            type: maskType,
+            colorScheme: {
+              primary: maskTypeInfo.baseColor,
+              secondary: '#FFFFFF',
+              accent: '#FFD700',
+              variants: [maskTypeInfo.baseColor, '#FFFFFF', '#FFD700']
+            },
+            expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000), // 48 hours from now
+            streakCount: 1,
+            timeRemaining: 48 * 60 * 60 * 1000, // 48 hours in milliseconds
+          };
+
           set({
+            currentMask: newMask,
+            selectedMaskType: null,
             isLoading: false,
-            error: error.message || 'Failed to create mask',
+            error: null,
           });
-          return false;
-        }
+
+          get().addToHistory(newMask);
+        }, 1000);
+
+        return true;
       },
 
       renewMask: async () => {
