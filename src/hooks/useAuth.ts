@@ -24,6 +24,11 @@ export function useAuth() {
 
   // Auto-check authentication on mount, but only after hydration with debounce
   useEffect(() => {
+    // Skip auto auth check in development to prevent fetch errors
+    if (process.env.NODE_ENV === 'development') {
+      return;
+    }
+
     if (mounted && !isAuthenticated && !user && !isLoading) {
       // Clear any existing timeout
       if (authCheckRef.current) {
