@@ -180,8 +180,15 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       checkAuth: async () => {
+        const { isCheckingAuth } = get();
+
+        // Prevent multiple simultaneous auth checks
+        if (isCheckingAuth) {
+          return;
+        }
+
         try {
-          set({ isLoading: true });
+          set({ isLoading: true, isCheckingAuth: true });
 
           const response = await fetch('/api/auth/me', {
             method: 'GET',
