@@ -44,18 +44,26 @@ export default function ExplorePage() {
       >
         {/* Floating particles */}
         <div className="absolute inset-0">
-          {Array.from({ length: 50 }, (_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-red-500 rounded-full opacity-20 animate-pulse"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${3 + Math.random() * 2}s`
-              }}
-            />
-          ))}
+          {Array.from({ length: 50 }, (_, i) => {
+            // Use deterministic values based on index to avoid hydration mismatch
+            const left = (i * 7.23) % 100;
+            const top = (i * 11.17) % 100;
+            const delay = (i * 0.13) % 3;
+            const duration = 3 + (i * 0.07) % 2;
+
+            return (
+              <div
+                key={i}
+                className="absolute w-1 h-1 bg-red-500 rounded-full opacity-20 animate-pulse"
+                style={{
+                  left: `${left}%`,
+                  top: `${top}%`,
+                  animationDelay: `${delay}s`,
+                  animationDuration: `${duration}s`
+                }}
+              />
+            );
+          })}
         </div>
 
         {/* Grid pattern overlay */}
