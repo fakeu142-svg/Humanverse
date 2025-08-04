@@ -220,6 +220,7 @@ export const useAuthStore = create<AuthStore>()(
             user: null,
             isAuthenticated: false,
             isLoading: false,
+            isCheckingAuth: false,
             error: null,
           });
         } catch (error: any) {
