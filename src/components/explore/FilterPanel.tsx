@@ -114,14 +114,20 @@ export function FilterPanel({
   useEffect(() => {
     if (!mounted) return;
 
+    const abortController = new AbortController();
+
     if (isAuthenticated) {
-      loadFilterOptions();
-      loadPresets();
+      loadFilterOptions(abortController.signal);
+      loadPresets(abortController.signal);
     } else {
       // Use demo data for unauthenticated users
       setFilterOptions(getDemoFilterOptions());
       setPresets([]);
     }
+
+    return () => {
+      abortController.abort();
+    };
   }, [mounted, isAuthenticated]);
 
   const loadFilterOptions = async () => {
