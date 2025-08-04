@@ -60,11 +60,15 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
 
   // Handle unhandled promise rejections
   window.addEventListener('unhandledrejection', function(event) {
-    if (event.reason && event.reason.message && (
-        event.reason.message.includes('Loading chunk') ||
-        event.reason.message.includes('Failed to fetch')
+    if (event.reason && (
+        (event.reason.message && (
+          event.reason.message.includes('Loading chunk') ||
+          event.reason.message.includes('Failed to fetch')
+        )) ||
+        event.reason.name === 'AbortError' ||
+        (event.reason.message && event.reason.message.includes('signal is aborted'))
     )) {
-      console.warn('Chunk loading failed, continuing:', event.reason.message);
+      console.warn('HMR/Development related error, continuing:', event.reason.message || event.reason.name);
       event.preventDefault();
     }
   });
