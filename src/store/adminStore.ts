@@ -92,35 +92,14 @@ export const useAdminStore = create<AdminStore>()(
       },
 
       logout: async () => {
-        try {
-          set({ isLoading: true });
-
-          await fetch('/api/admin/auth', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ action: 'logout' }),
-          });
-
-          set({
-            admin: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null,
-            sessionExpiry: null,
-          });
-        } catch (error: any) {
-          console.error('Admin logout error:', error);
-          // Force logout even if API call fails
-          set({
-            admin: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null,
-            sessionExpiry: null,
-          });
-        }
+        console.log('Admin logout in demo mode');
+        set({
+          admin: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: null,
+          sessionExpiry: null,
+        });
       },
 
       checkAuth: async () => {
