@@ -40,6 +40,7 @@ interface ExploreFeedProps {
   showTrendingBar?: boolean;
   showAdminData?: boolean;
   initialFilters?: ContentFilters;
+  demoMode?: boolean;
   className?: string;
 }
 
