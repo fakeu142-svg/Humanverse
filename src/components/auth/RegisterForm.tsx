@@ -253,8 +253,8 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           <div className="text-center space-y-4">
             <div className="text-desert-400 text-sm">
               Already have a mask?{' '}
-              <Link 
-                href="/auth/login"
+              <Link
+                href="/login"
                 className="text-desert-300 hover:text-desert-200 font-medium underline underline-offset-2 transition-colors duration-200"
               >
                 Return to your identity
