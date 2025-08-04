@@ -113,11 +113,8 @@ export default function ChatRoomsPage() {
         setLoading(false);
       }, 500);
 
-      const data = await response.json();
-      setRooms(data.rooms);
     } catch (error) {
       console.error('Load rooms error:', error);
-    } finally {
       setLoading(false);
     }
   };
