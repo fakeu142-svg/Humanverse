@@ -34,11 +34,20 @@ export function TrendingBar({
   const [autoScroll, setAutoScroll] = useState(true);
 
   useEffect(() => {
-    loadTrendingContent();
-    
+    const abortController = new AbortController();
+
+    loadTrendingContent(abortController.signal);
+
     // Auto-refresh every 5 minutes
-    const interval = setInterval(loadTrendingContent, 5 * 60 * 1000);
-    return () => clearInterval(interval);
+    const interval = setInterval(() => {
+      const refreshController = new AbortController();
+      loadTrendingContent(refreshController.signal);
+    }, 5 * 60 * 1000);
+
+    return () => {
+      clearInterval(interval);
+      abortController.abort();
+    };
   }, [timeWindow]);
 
   const loadTrendingContent = async () => {
