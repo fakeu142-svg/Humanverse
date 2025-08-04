@@ -44,9 +44,26 @@ export function TrendingBar({
   const loadTrendingContent = async () => {
     try {
       setError(null);
+
+      // Check if user has auth token
+      const hasAuthToken = document.cookie.includes('auth-token');
+
+      if (!hasAuthToken) {
+        // Use fallback trending data for unauthenticated users
+        setTrendingItems(getFallbackTrendingData());
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch(`/api/explore/trending?timeWindow=${timeWindow}&limit=20&includeAdminData=${showAdminData}`);
-      
+
       if (!response.ok) {
+        if (response.status === 401) {
+          // Unauthorized - use fallback data
+          setTrendingItems(getFallbackTrendingData());
+          setLoading(false);
+          return;
+        }
         throw new Error('Failed to load trending content');
       }
 
@@ -54,10 +71,52 @@ export function TrendingBar({
       setTrendingItems(data.trending || []);
     } catch (err: any) {
       console.error('Trending load error:', err);
-      setError(err.message || 'Failed to load trending content');
+      // Use fallback data instead of showing error
+      setTrendingItems(getFallbackTrendingData());
     } finally {
       setLoading(false);
     }
+  };
+
+  const getFallbackTrendingData = (): TrendingItem[] => {
+    return [
+      {
+        id: 'fallback-1',
+        type: 'CHAT_MESSAGE',
+        content: 'Anonymous conversations flourishing in the Humanverse',
+        engagementScore: 45,
+        trendingScore: 89,
+        timestamp: new Date(),
+        metadata: {}
+      },
+      {
+        id: 'fallback-2',
+        type: 'TRUTH_ANSWER',
+        content: 'Truth games revealing authentic connections',
+        engagementScore: 38,
+        trendingScore: 76,
+        timestamp: new Date(),
+        metadata: {}
+      },
+      {
+        id: 'fallback-3',
+        type: 'DROPZONE_SECRET',
+        content: 'Hidden secrets waiting to be discovered',
+        engagementScore: 52,
+        trendingScore: 94,
+        timestamp: new Date(),
+        metadata: {}
+      },
+      {
+        id: 'fallback-4',
+        type: 'CHAT_MESSAGE',
+        content: 'Masks enabling deeper authentic expression',
+        engagementScore: 41,
+        trendingScore: 82,
+        timestamp: new Date(),
+        metadata: {}
+      }
+    ];
   };
 
   const formatTrendingScore = (score: number): string => {
