@@ -58,8 +58,9 @@ export function ExploreFeed({
   const [sortMode, setSortMode] = useState<'algorithm' | 'chronological' | 'engagement'>('algorithm');
   const [realTimeUpdates, setRealTimeUpdates] = useState(true);
 
-  // Generate demo data for unauthenticated users
+  // Generate demo data for unauthenticated users (using static timestamps to avoid hydration mismatch)
   const getDemoContent = (): ContentItem[] => {
+    const baseTime = new Date('2024-01-15T10:00:00Z').getTime();
     return [
       {
         id: 'demo-1',
@@ -67,7 +68,7 @@ export function ExploreFeed({
         userId: 'demo-user-1',
         username: 'ShadowFox',
         content: 'Sometimes the mask you wear becomes more real than the face beneath it...',
-        timestamp: new Date(Date.now() - 15 * 60 * 1000),
+        timestamp: new Date(baseTime - 15 * 60 * 1000),
         engagementScore: 0.85,
         metadata: { roomName: 'Philosophy Room' }
       },
@@ -77,7 +78,7 @@ export function ExploreFeed({
         userId: 'demo-user-2',
         username: 'VoidWhisperer',
         content: 'My biggest fear? That authenticity is just another performance we put on.',
-        timestamp: new Date(Date.now() - 32 * 60 * 1000),
+        timestamp: new Date(baseTime - 32 * 60 * 1000),
         engagementScore: 0.72,
         metadata: { questionId: 'truth-123' }
       },
@@ -87,7 +88,7 @@ export function ExploreFeed({
         userId: 'demo-user-3',
         username: 'UrbanNomad',
         content: 'Hidden in plain sight: the coffee shop where broken hearts come to heal.',
-        timestamp: new Date(Date.now() - 48 * 60 * 1000),
+        timestamp: new Date(baseTime - 48 * 60 * 1000),
         engagementScore: 0.91,
         metadata: { location: 'Downtown District', unlocked: true }
       },
@@ -97,7 +98,7 @@ export function ExploreFeed({
         userId: 'demo-user-4',
         username: 'EchoingVoid',
         content: 'In anonymity, I found the courage to be brutally honest about my demons.',
-        timestamp: new Date(Date.now() - 67 * 60 * 1000),
+        timestamp: new Date(baseTime - 67 * 60 * 1000),
         engagementScore: 0.78,
         metadata: { roomName: 'Support Circle' }
       },
@@ -107,7 +108,7 @@ export function ExploreFeed({
         userId: 'demo-user-5',
         username: 'MidnightSage',
         content: 'Love is recognizing yourself in a stranger while wearing a different face.',
-        timestamp: new Date(Date.now() - 89 * 60 * 1000),
+        timestamp: new Date(baseTime - 89 * 60 * 1000),
         engagementScore: 0.94,
         metadata: { questionId: 'truth-456' }
       },
@@ -117,7 +118,7 @@ export function ExploreFeed({
         userId: 'demo-user-6',
         username: 'GlitchPoet',
         content: 'Abandoned subway platform - where the city keeps its forgotten dreams.',
-        timestamp: new Date(Date.now() - 102 * 60 * 1000),
+        timestamp: new Date(baseTime - 102 * 60 * 1000),
         engagementScore: 0.66,
         metadata: { location: 'Underground', unlocked: false }
       }
