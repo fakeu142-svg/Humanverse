@@ -230,11 +230,11 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
               
               {/* Mobile User Section */}
               <div className="border-t border-gray-700 pt-4 pb-3">
-                {currentMask && (
+                {isAuthenticated && currentMask && (
                   <div className="flex items-center px-3 mb-3">
-                    <div 
+                    <div
                       className="w-10 h-10 rounded-full flex items-center justify-center"
-                      style={{ 
+                      style={{
                         backgroundColor: `${currentMask.colorScheme?.primary || '#DAA520'}20`,
                         border: `2px solid ${currentMask.colorScheme?.primary || '#DAA520'}40`
                       }}
@@ -247,12 +247,35 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
                     </div>
                   </div>
                 )}
-                <button
-                  onClick={handleLogout}
-                  className="block w-full text-left px-3 py-2 text-base font-medium text-red-400 hover:text-red-300 hover:bg-red-600/10 rounded-md transition-colors"
-                >
-                  Logout
-                </button>
+
+                {!isAuthenticated && (
+                  <div className="flex items-center px-3 mb-3">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-purple-600/20 border-2 border-purple-600/40">
+                      🎭
+                    </div>
+                    <div className="ml-3">
+                      <div className="text-base font-medium text-purple-300">Demo Mode</div>
+                      <div className="text-sm font-medium text-purple-400">Guest Access</div>
+                    </div>
+                  </div>
+                )}
+
+                {isAuthenticated ? (
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-red-400 hover:text-red-300 hover:bg-red-600/10 rounded-md transition-colors"
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-blue-400 hover:text-blue-300 hover:bg-blue-600/10 rounded-md transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                )}
               </div>
             </div>
           </motion.div>
