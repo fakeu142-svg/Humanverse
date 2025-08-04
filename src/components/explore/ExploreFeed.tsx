@@ -124,25 +124,31 @@ export function ExploreFeed({
     ];
   };
 
-  // Use the content feed hook with infinite scroll (or demo data)
-  const {
-    data: content,
-    loading,
-    hasMore,
-    error,
-    loadMore,
-    reset,
-    refresh,
-    prependItem,
-    removeItem,
-    updateItem,
-    sentinelRef,
-    cacheInfo
-  } = useContentFeed('/api/explore/feed', filters, {
+  // Use either demo data or real feed
+  const feedHook = useContentFeed(demoMode ? null : '/api/explore/feed', filters, {
     initialLimit: 20,
     incrementLimit: 20,
-    preloadPages: 1
+    preloadPages: 1,
+    enabled: !demoMode
   });
+
+  // For demo mode, use static data
+  const demoData = demoMode ? getDemoContent() : [];
+
+  const {
+    data: content = demoData,
+    loading = demoMode ? false : feedHook.loading,
+    hasMore = demoMode ? false : feedHook.hasMore,
+    error = demoMode ? null : feedHook.error,
+    loadMore = demoMode ? () => {} : feedHook.loadMore,
+    reset = demoMode ? () => {} : feedHook.reset,
+    refresh = demoMode ? () => {} : feedHook.refresh,
+    prependItem = demoMode ? () => {} : feedHook.prependItem,
+    removeItem = demoMode ? () => {} : feedHook.removeItem,
+    updateItem = demoMode ? () => {} : feedHook.updateItem,
+    sentinelRef = feedHook.sentinelRef,
+    cacheInfo = feedHook.cacheInfo
+  } = demoMode ? { sentinelRef: null, cacheInfo: null } : feedHook;
 
   // Reset feed when filters change
   useEffect(() => {
