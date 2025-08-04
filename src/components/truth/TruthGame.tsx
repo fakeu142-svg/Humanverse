@@ -42,41 +42,79 @@ export function TruthGame() {
   const [difficulty, setDifficulty] = useState<number>(3);
 
   useEffect(() => {
-    if (user) {
-      loadCurrentQuestion();
+    loadCurrentQuestion();
+  }, [selectedCategory, difficulty]);
+
+  const getDemoQuestions = (): TruthQuestion[] => [
+    {
+      id: 'demo-1',
+      category: 'Identity',
+      question: 'What mask do you wear when you\'re most afraid of being judged?',
+      difficulty: 3,
+      psychTags: ['vulnerability', 'social_anxiety', 'authenticity'],
+      emotionalTrigger: 'fear_of_judgment'
+    },
+    {
+      id: 'demo-2',
+      category: 'Relationships',
+      question: 'Have you ever pretended to like someone just to avoid loneliness?',
+      difficulty: 4,
+      psychTags: ['loneliness', 'authenticity', 'relationships'],
+      emotionalTrigger: 'isolation_fear'
+    },
+    {
+      id: 'demo-3',
+      category: 'Dreams',
+      question: 'What dream did you give up on that still haunts you?',
+      difficulty: 5,
+      psychTags: ['regret', 'aspirations', 'loss'],
+      emotionalTrigger: 'unfulfilled_potential'
+    },
+    {
+      id: 'demo-4',
+      category: 'Secrets',
+      question: 'What truth about yourself would change how people see you?',
+      difficulty: 4,
+      psychTags: ['hidden_truth', 'perception', 'fear'],
+      emotionalTrigger: 'identity_crisis'
+    },
+    {
+      id: 'demo-5',
+      category: 'Childhood',
+      question: 'What childhood belief about yourself still affects you today?',
+      difficulty: 3,
+      psychTags: ['childhood_trauma', 'self_concept', 'beliefs'],
+      emotionalTrigger: 'core_beliefs'
     }
-  }, [user, selectedCategory, difficulty]);
+  ];
 
   const loadCurrentQuestion = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams({
-        count: '1',
-        difficulty: difficulty.toString(),
-        targeted: 'true' // Enable psychological targeting
-      });
-      
-      if (selectedCategory !== 'all') {
-        params.append('category', selectedCategory);
-      }
+      console.log('Loading demo truth question');
 
-      const response = await fetch(`/api/truth/questions?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      // Get demo questions
+      const demoQuestions = getDemoQuestions();
 
-      if (!response.ok) {
-        throw new Error('Failed to load question');
-      }
+      // Filter by category if not 'all'
+      const filteredQuestions = selectedCategory === 'all'
+        ? demoQuestions
+        : demoQuestions.filter(q => q.category.toLowerCase() === selectedCategory.toLowerCase());
 
-      const data = await response.json();
-      if (data.questions && data.questions.length > 0) {
-        setCurrentQuestion(data.questions[0]);
-      }
+      // Filter by difficulty
+      const difficultyFiltered = filteredQuestions.filter(q => q.difficulty <= difficulty);
+
+      // Select random question
+      const availableQuestions = difficultyFiltered.length > 0 ? difficultyFiltered : filteredQuestions;
+      const randomQuestion = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+
+      setTimeout(() => {
+        setCurrentQuestion(randomQuestion);
+        setLoading(false);
+      }, 500);
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load question');
-    } finally {
       setLoading(false);
     }
   };
@@ -188,7 +226,7 @@ export function TruthGame() {
         >
           <div className="flex justify-center space-x-2 mb-6">
             {[
-              { mode: 'answer' as GameMode, label: 'Answer', icon: '💭' },
+              { mode: 'answer' as GameMode, label: 'Answer', icon: '��' },
               { mode: 'guess' as GameMode, label: 'Guess', icon: '🤔' },
               { mode: 'feed' as GameMode, label: 'Feed', icon: '📡' },
               { mode: 'stats' as GameMode, label: 'Stats', icon: '📊' }
