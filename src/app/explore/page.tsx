@@ -130,10 +130,11 @@ export default function ExplorePage() {
 
       {/* Main Content */}
       <div className="relative z-10">
-        <ExploreFeed 
-          showFilterPanel={true}
+        <ExploreFeed
+          showFilterPanel={!isDemo}
           showTrendingBar={true}
           showAdminData={false}
+          demoMode={isDemo}
           className="bg-black/80 backdrop-blur-sm"
         />
       </div>
