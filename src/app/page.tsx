@@ -118,13 +118,13 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
-              <Link href="/auth/register">
+              <Link href="/register">
                 <button className="bg-desert-500 hover:bg-desert-400 text-desert-100 font-semibold py-4 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
                   Enter the Verse
                 </button>
               </Link>
-              
-              <Link href="/auth/login">
+
+              <Link href="/login">
                 <button className="border border-desert-500 hover:bg-desert-500/20 text-desert-300 hover:text-desert-100 font-semibold py-4 px-8 rounded-lg transition-all duration-300">
                   Return to Your Mask
                 </button>
