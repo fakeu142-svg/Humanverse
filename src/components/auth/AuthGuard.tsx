@@ -20,14 +20,8 @@ export function AuthGuard({
   const { isAuthenticated, user, checkAuth, isLoading } = useAuthStore();
 
   useEffect(() => {
-    // Skip auth check in demo environments to prevent fetch errors
-    const isDemo = window.location.hostname.includes('fly.dev') ||
-                  window.location.hostname.includes('localhost') ||
-                  process.env.NODE_ENV === 'development';
-
-    if (!isDemo) {
-      checkAuth();
-    }
+    // Auth checks completely disabled in demo mode
+    console.log('AuthGuard: Auth checks disabled');
   }, [checkAuth]);
 
   // Show loading state
