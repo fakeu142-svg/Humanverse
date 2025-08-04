@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+// Global flag to completely disable auth in demo environments
+const AUTH_DISABLED = true;
+
 // Safe fetch wrapper to prevent analytics interference
 const safeFetch = async (url: string, options?: RequestInit) => {
   try {
