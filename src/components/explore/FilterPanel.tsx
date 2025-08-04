@@ -130,9 +130,14 @@ export function FilterPanel({
       if (response.ok) {
         const data = await response.json();
         setFilterOptions(data.options);
+      } else {
+        // Fallback to demo data on error
+        setFilterOptions(getDemoFilterOptions());
       }
     } catch (error) {
       console.error('Failed to load filter options:', error);
+      // Fallback to demo data on error
+      setFilterOptions(getDemoFilterOptions());
     }
   };
 
@@ -142,9 +147,14 @@ export function FilterPanel({
       if (response.ok) {
         const data = await response.json();
         setPresets(data.presets || []);
+      } else {
+        // Set empty presets on error
+        setPresets([]);
       }
     } catch (error) {
       console.error('Failed to load presets:', error);
+      // Set empty presets on error
+      setPresets([]);
     }
   };
 
