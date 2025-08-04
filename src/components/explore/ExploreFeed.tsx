@@ -124,31 +124,27 @@ export function ExploreFeed({
     ];
   };
 
-  // Use either demo data or real feed
-  const feedHook = useContentFeed(demoMode ? null : '/api/explore/feed', filters, {
+  // Use the content feed hook with infinite scroll
+  const feedHook = useContentFeed('/api/explore/feed', filters, {
     initialLimit: 20,
     incrementLimit: 20,
-    preloadPages: 1,
-    enabled: !demoMode
+    preloadPages: 1
   });
 
-  // For demo mode, use static data
-  const demoData = demoMode ? getDemoContent() : [];
-
-  const {
-    data: content = demoData,
-    loading = demoMode ? false : feedHook.loading,
-    hasMore = demoMode ? false : feedHook.hasMore,
-    error = demoMode ? null : feedHook.error,
-    loadMore = demoMode ? () => {} : feedHook.loadMore,
-    reset = demoMode ? () => {} : feedHook.reset,
-    refresh = demoMode ? () => {} : feedHook.refresh,
-    prependItem = demoMode ? () => {} : feedHook.prependItem,
-    removeItem = demoMode ? () => {} : feedHook.removeItem,
-    updateItem = demoMode ? () => {} : feedHook.updateItem,
-    sentinelRef = feedHook.sentinelRef,
-    cacheInfo = feedHook.cacheInfo
-  } = demoMode ? { sentinelRef: null, cacheInfo: null } : feedHook;
+  // For demo mode, override with static data
+  const demoData = getDemoContent();
+  const content = demoMode ? demoData : feedHook.data;
+  const loading = demoMode ? false : feedHook.loading;
+  const hasMore = demoMode ? false : feedHook.hasMore;
+  const error = demoMode ? null : feedHook.error;
+  const loadMore = demoMode ? () => {} : feedHook.loadMore;
+  const reset = demoMode ? () => {} : feedHook.reset;
+  const refresh = demoMode ? () => {} : feedHook.refresh;
+  const prependItem = demoMode ? () => {} : feedHook.prependItem;
+  const removeItem = demoMode ? () => {} : feedHook.removeItem;
+  const updateItem = demoMode ? () => {} : feedHook.updateItem;
+  const sentinelRef = feedHook.sentinelRef;
+  const cacheInfo = feedHook.cacheInfo;
 
   // Reset feed when filters change
   useEffect(() => {
