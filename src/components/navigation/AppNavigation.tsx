@@ -17,6 +17,11 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
   const { isAuthenticated, user, logout } = useAuthStore();
   const { currentMask } = useMaskStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
