@@ -278,7 +278,7 @@ export function FilterPanel({
             )}
           </div>
 
-          {showSavePreset && (
+          {mounted && isAuthenticated && showSavePreset && (
             <div className="mb-3 p-3 bg-gray-700 rounded">
               <div className="flex gap-2">
                 <input
