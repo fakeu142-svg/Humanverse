@@ -56,7 +56,11 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
     }
   ];
 
-  if (!isAuthenticated) {
+  // Show navigation for authenticated users OR for demo pages
+  const demoPages = ['/explore', '/truth', '/chat', '/dropzone', '/mask-selection'];
+  const isDemoPage = demoPages.some(page => pathname.startsWith(page));
+
+  if (!isAuthenticated && !isDemoPage) {
     return null;
   }
 
