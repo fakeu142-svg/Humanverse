@@ -27,13 +27,19 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     }
 
     const success = await login(email, password);
-    
+
     if (success) {
       toast.success('Welcome back to the Humanverse!');
       onSuccess?.();
     } else {
       toast.error(error || 'Login failed');
     }
+  };
+
+  const useDemoCredentials = () => {
+    setEmail('demo@humanverse.com');
+    setPassword('demo123');
+    toast('Demo credentials loaded - click Enter the Verse', { icon: '🎭' });
   };
 
   return (
