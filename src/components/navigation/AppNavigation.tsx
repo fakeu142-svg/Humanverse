@@ -118,11 +118,11 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
           <div className="hidden md:block">
             <div className="ml-4 flex items-center md:ml-6">
               {/* Current Mask Display */}
-              {currentMask && (
+              {isAuthenticated && currentMask && (
                 <div className="flex items-center space-x-3 mr-4 px-3 py-1 bg-white/5 rounded-lg">
-                  <div 
+                  <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                    style={{ 
+                    style={{
                       backgroundColor: `${currentMask.colorScheme?.primary || '#DAA520'}20`,
                       border: `2px solid ${currentMask.colorScheme?.primary || '#DAA520'}40`
                     }}
@@ -136,13 +136,35 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
                 </div>
               )}
 
-              {/* Logout Button */}
-              <button
-                onClick={handleLogout}
-                className="bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 border border-red-600/20 hover:border-red-600/40"
-              >
-                Logout
-              </button>
+              {/* Demo Mode Display */}
+              {!isAuthenticated && (
+                <div className="flex items-center space-x-3 mr-4 px-3 py-1 bg-purple-600/20 rounded-lg border border-purple-600/30">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm bg-purple-600/20">
+                    🎭
+                  </div>
+                  <div className="text-sm">
+                    <div className="text-purple-300 font-medium">Demo Mode</div>
+                    <div className="text-purple-400 text-xs">Guest Access</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Logout Button / Login Button */}
+              {isAuthenticated ? (
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 border border-red-600/20 hover:border-red-600/40"
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-blue-300 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 border border-blue-600/20 hover:border-blue-600/40"
+                >
+                  Login
+                </Link>
+              )}
             </div>
           </div>
 
