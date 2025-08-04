@@ -156,7 +156,7 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
               )}
 
               {/* Logout Button / Login Button */}
-              {isAuthenticated ? (
+              {mounted && isAuthenticated ? (
                 <button
                   onClick={handleLogout}
                   className="bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 border border-red-600/20 hover:border-red-600/40"
