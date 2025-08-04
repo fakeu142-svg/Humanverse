@@ -50,18 +50,79 @@ export function FilterPanel({
   showAdvanced = false,
   className = ''
 }: FilterPanelProps) {
+  const { isAuthenticated } = useAuthStore();
   const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null);
   const [presets, setPresets] = useState<FilterPreset[]>([]);
   const [showPresets, setShowPresets] = useState(false);
   const [showAdvancedPanel, setShowAdvancedPanel] = useState(showAdvanced);
   const [newPresetName, setNewPresetName] = useState('');
   const [showSavePreset, setShowSavePreset] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Load filter options on mount
+  // Ensure component is mounted before checking auth
   useEffect(() => {
-    loadFilterOptions();
-    loadPresets();
+    setMounted(true);
   }, []);
+
+  // Generate demo filter options
+  const getDemoFilterOptions = (): FilterOptions => {
+    return {
+      contentTypes: [
+        { value: 'CHAT_MESSAGE', label: 'Chat Messages', count: 152 },
+        { value: 'TRUTH_ANSWER', label: 'Truth Answers', count: 89 },
+        { value: 'DROPZONE_SECRET', label: 'DropZone Secrets', count: 34 },
+        { value: 'ADMIN_PLANT', label: 'Featured Content', count: 12 }
+      ],
+      timeRanges: [
+        { value: 'hour', label: 'Past Hour' },
+        { value: 'day', label: 'Past Day' },
+        { value: 'week', label: 'Past Week' },
+        { value: 'month', label: 'Past Month' },
+        { value: 'all', label: 'All Time' }
+      ],
+      emotionalTones: [
+        { value: 'positive', label: 'Positive' },
+        { value: 'negative', label: 'Negative' },
+        { value: 'neutral', label: 'Neutral' },
+        { value: 'controversial', label: 'Controversial' }
+      ],
+      engagementLevels: [
+        { value: 'high', label: 'High Engagement' },
+        { value: 'medium', label: 'Medium Engagement' },
+        { value: 'low', label: 'Low Engagement' }
+      ],
+      userRiskLevels: [
+        { value: 'high', label: 'High Risk' },
+        { value: 'medium', label: 'Medium Risk' },
+        { value: 'low', label: 'Low Risk' }
+      ],
+      psychologicalTags: [
+        { value: 'vulnerability', label: 'Vulnerability' },
+        { value: 'authenticity', label: 'Authenticity' },
+        { value: 'anonymity', label: 'Anonymity' },
+        { value: 'connection', label: 'Connection' }
+      ],
+      availableUsers: [
+        { id: 'demo-1', username: 'ShadowFox' },
+        { id: 'demo-2', username: 'VoidWhisperer' },
+        { id: 'demo-3', username: 'UrbanNomad' }
+      ]
+    };
+  };
+
+  // Load filter options on mount (with auth check)
+  useEffect(() => {
+    if (!mounted) return;
+
+    if (isAuthenticated) {
+      loadFilterOptions();
+      loadPresets();
+    } else {
+      // Use demo data for unauthenticated users
+      setFilterOptions(getDemoFilterOptions());
+      setPresets([]);
+    }
+  }, [mounted, isAuthenticated]);
 
   const loadFilterOptions = async () => {
     try {
