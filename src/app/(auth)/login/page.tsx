@@ -10,8 +10,10 @@ export default function LoginPage() {
   const { isAuthenticated, checkAuth } = useAuthStore();
 
   useEffect(() => {
-    // Check if user is already authenticated
-    checkAuth();
+    // Check if user is already authenticated (skip in development)
+    if (process.env.NODE_ENV !== 'development') {
+      checkAuth();
+    }
   }, [checkAuth]);
 
   useEffect(() => {
