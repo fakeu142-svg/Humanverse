@@ -10,8 +10,8 @@ interface AdminLoginProps {
 }
 
 export default function AdminLogin({ onSuccess }: AdminLoginProps) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@humanverse.com');
+  const [password, setPassword] = useState('HumanVerse2024!');
   const [showPassword, setShowPassword] = useState(false);
   
   const { login, isLoading, error, clearError } = useAdminStore();
