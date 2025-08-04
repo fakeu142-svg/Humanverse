@@ -49,6 +49,7 @@ export function ExploreFeed({
   showTrendingBar = true,
   showAdminData = false,
   initialFilters = {},
+  demoMode = false,
   className = ''
 }: ExploreFeedProps) {
   const [filters, setFilters] = useState<ContentFilters>(initialFilters);
