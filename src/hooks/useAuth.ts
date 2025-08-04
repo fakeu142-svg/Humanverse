@@ -24,8 +24,14 @@ export function useAuth() {
 
   // Auto-check authentication on mount, but only after hydration with debounce
   useEffect(() => {
-    // Skip auto auth check in development to prevent fetch errors
-    if (process.env.NODE_ENV === 'development') {
+    // Skip auto auth check in demo environments to prevent fetch errors
+    const isDemo = typeof window !== 'undefined' && (
+      window.location.hostname.includes('fly.dev') ||
+      window.location.hostname.includes('localhost') ||
+      process.env.NODE_ENV === 'development'
+    );
+
+    if (isDemo) {
       return;
     }
 
