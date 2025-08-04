@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
-import { AdminGuard } from '@/components/admin/AdminGuard';
+import AdminGuard from '@/components/admin/AdminGuard';
 import { 
   KeyIcon,
   ShieldCheckIcon,
