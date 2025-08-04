@@ -65,6 +65,9 @@ export default function AdminLogin({ onSuccess }: AdminLoginProps) {
             <div className="mt-2 text-xs text-danger">
               ⚠️ RESTRICTED ACCESS ⚠️
             </div>
+            <div className="mt-2 text-xs text-purple-400 bg-purple-900/20 rounded px-2 py-1">
+              🎭 DEMO MODE - Credentials pre-filled
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
