@@ -33,6 +33,29 @@ export function useAdminAuth() {
     }
   }, [sessionExpiry, logout]);
 
+  // Add mock implementations for security settings
+  const updateSecuritySettings = async (settings: any) => {
+    console.log('Updating security settings:', settings);
+    return true;
+  };
+
+  const getSecurityLogs = async () => {
+    return [
+      {
+        id: '1',
+        timestamp: new Date().toISOString(),
+        adminId: '1',
+        adminUsername: 'admin',
+        action: 'Login',
+        details: 'Successful admin login',
+        ipAddress: '192.168.1.100',
+        userAgent: 'Chrome/120.0.0.0',
+        riskLevel: 'low',
+        status: 'success'
+      }
+    ];
+  };
+
   return {
     admin,
     isAuthenticated,
@@ -45,6 +68,8 @@ export function useAdminAuth() {
     clearError,
     hasPermission,
     isRole,
+    updateSecuritySettings,
+    getSecurityLogs,
   };
 }
 
