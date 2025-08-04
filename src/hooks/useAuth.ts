@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 
 export function useAuth() {
+  const [mounted, setMounted] = useState(false);
   const {
     user,
     isAuthenticated,
@@ -16,12 +17,16 @@ export function useAuth() {
     clearError,
   } = useAuthStore();
 
-  // Auto-check authentication on mount
   useEffect(() => {
-    if (!isAuthenticated && !user) {
+    setMounted(true);
+  }, []);
+
+  // Auto-check authentication on mount, but only after hydration
+  useEffect(() => {
+    if (mounted && !isAuthenticated && !user) {
       checkAuth();
     }
-  }, [checkAuth, isAuthenticated, user]);
+  }, [mounted, checkAuth, isAuthenticated, user]);
 
   return {
     user,
