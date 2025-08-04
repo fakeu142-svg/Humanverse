@@ -333,6 +333,7 @@ export function useMaskSelection() {
     availableMaskTypes,
     setSelectedMaskType,
     createMask,
+    loadAvailableMasks,
     isLoading,
     error,
     clearError,
