@@ -130,9 +130,9 @@ export function FilterPanel({
     };
   }, [mounted, isAuthenticated]);
 
-  const loadFilterOptions = async () => {
+  const loadFilterOptions = async (signal?: AbortSignal) => {
     try {
-      const response = await fetch('/api/explore/filter?action=options');
+      const response = await fetch('/api/explore/filter?action=options', { signal });
       if (response.ok) {
         const data = await response.json();
         setFilterOptions(data.options);
@@ -140,16 +140,19 @@ export function FilterPanel({
         // Fallback to demo data on error
         setFilterOptions(getDemoFilterOptions());
       }
-    } catch (error) {
-      console.error('Failed to load filter options:', error);
+    } catch (error: any) {
+      // Don't log abort errors - they're expected during HMR
+      if (error.name !== 'AbortError') {
+        console.error('Failed to load filter options:', error);
+      }
       // Fallback to demo data on error
       setFilterOptions(getDemoFilterOptions());
     }
   };
 
-  const loadPresets = async () => {
+  const loadPresets = async (signal?: AbortSignal) => {
     try {
-      const response = await fetch('/api/explore/filter?action=presets');
+      const response = await fetch('/api/explore/filter?action=presets', { signal });
       if (response.ok) {
         const data = await response.json();
         setPresets(data.presets || []);
@@ -157,8 +160,11 @@ export function FilterPanel({
         // Set empty presets on error
         setPresets([]);
       }
-    } catch (error) {
-      console.error('Failed to load presets:', error);
+    } catch (error: any) {
+      // Don't log abort errors - they're expected during HMR
+      if (error.name !== 'AbortError') {
+        console.error('Failed to load presets:', error);
+      }
       // Set empty presets on error
       setPresets([]);
     }
