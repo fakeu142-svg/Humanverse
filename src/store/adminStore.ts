@@ -163,67 +163,16 @@ export const useAdminStore = create<AdminStore>()(
       },
 
       checkAuth: async () => {
-        try {
-          const state = get();
-          
-          // Check if session has expired
-          if (state.sessionExpiry && new Date() > state.sessionExpiry) {
-            set({
-              admin: null,
-              isAuthenticated: false,
-              isLoading: false,
-              error: 'Session expired',
-              sessionExpiry: null,
-            });
-            return;
-          }
-
-          set({ isLoading: true });
-
-          const response = await fetch('/api/admin/auth', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.admin) {
-              const sessionExpiry = new Date(Date.now() + parseInt(process.env.NEXT_PUBLIC_ADMIN_SESSION_TIMEOUT || '3600') * 1000);
-              
-              set({
-                admin: {
-                  ...data.admin,
-                  lastLogin: data.admin.lastLogin ? new Date(data.admin.lastLogin) : null,
-                },
-                isAuthenticated: true,
-                isLoading: false,
-                error: null,
-                sessionExpiry,
-              });
-              return;
-            }
-          }
-
-          // If check fails, clear auth state
-          set({
-            admin: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null,
-            sessionExpiry: null,
-          });
-        } catch (error: any) {
-          console.error('Admin auth check error:', error);
-          set({
-            admin: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null,
-            sessionExpiry: null,
-          });
-        }
+        // Completely disabled - no fetch calls allowed
+        console.log('Admin auth check completely disabled - demo mode');
+        set({
+          admin: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: null,
+          sessionExpiry: null,
+        });
+        return;
       },
 
       hasPermission: (permission: keyof AdminPermissions) => {
