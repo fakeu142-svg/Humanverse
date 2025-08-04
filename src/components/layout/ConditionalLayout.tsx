@@ -21,8 +21,12 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
     '/admin/soulgate'
   ];
 
+  // Pages that should show navigation even in demo mode
+  const demoPages = ['/explore', '/truth', '/chat', '/dropzone', '/mask-selection'];
+  const isDemoPage = demoPages.some(page => pathname.startsWith(page));
+
   // Check if current page should show navigation
-  const shouldShowNav = isAuthenticated && !pagesWithoutNav.includes(pathname) && !pathname.startsWith('/admin/');
+  const shouldShowNav = (isAuthenticated || isDemoPage) && !pagesWithoutNav.includes(pathname) && !pathname.startsWith('/admin/');
 
   return (
     <>
