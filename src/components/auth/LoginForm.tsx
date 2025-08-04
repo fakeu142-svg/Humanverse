@@ -158,8 +158,8 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
           <div className="text-center space-y-4">
             <div className="text-desert-400 text-sm">
               Don't have a mask yet?{' '}
-              <Link 
-                href="/auth/register"
+              <Link
+                href="/register"
                 className="text-desert-300 hover:text-desert-200 font-medium underline underline-offset-2 transition-colors duration-200"
               >
                 Create your identity
