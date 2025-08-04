@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useAuthStore } from '@/store/authStore';
 
 interface FilterOptions {
   contentTypes: Array<{ value: string; label: string; count: number }>;
