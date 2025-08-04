@@ -4,16 +4,36 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
   
   window.fetch = function(...args) {
     return originalFetch.apply(this, args).catch(error => {
+      // If it's an AbortError (common during HMR), handle gracefully
+      if (error.name === 'AbortError' || (error.message && error.message.includes('signal is aborted'))) {
+        console.warn('Request aborted (likely due to HMR), continuing:', error.message);
+        return Promise.resolve({
+          ok: false,
+          status: 499,
+          statusText: 'Request Aborted',
+          json: () => Promise.resolve({}),
+          text: () => Promise.resolve(''),
+          headers: new Headers(),
+          redirected: false,
+          type: 'basic',
+          url: args[0],
+          clone: function() { return this; },
+          arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+          blob: () => Promise.resolve(new Blob()),
+          formData: () => Promise.resolve(new FormData()),
+        });
+      }
+
       // If it's an HMR-related fetch failure, handle it gracefully
       const url = args[0];
-      
+
       if (typeof url === 'string' && (
-        url.includes('/_next/static/') || 
+        url.includes('/_next/static/') ||
         url.includes('webpack-hmr') ||
         url.includes('hot-update')
       )) {
         console.warn('HMR fetch failed, continuing without hot reload:', error.message);
-        
+
         // Return a mock response to prevent breaking the app
         return Promise.resolve({
           ok: false,
@@ -31,7 +51,7 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
           formData: () => Promise.resolve(new FormData()),
         });
       }
-      
+
       // For non-HMR requests, re-throw the error
       throw error;
     });
