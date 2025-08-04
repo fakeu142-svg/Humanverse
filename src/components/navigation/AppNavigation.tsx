@@ -163,14 +163,14 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
                 >
                   Logout
                 </button>
-              ) : (
+              ) : mounted ? (
                 <Link
                   href="/login"
                   className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-blue-300 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 border border-blue-600/20 hover:border-blue-600/40"
                 >
                   Login
                 </Link>
-              )}
+              ) : null}
             </div>
           </div>
 
