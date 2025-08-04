@@ -86,7 +86,7 @@ export const useAuthStore = create<AuthStore>()(
         try {
           set({ isLoading: true, error: null });
 
-          const response = await fetch('/api/auth/login', {
+          const response = await safeFetch('/api/auth/login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
