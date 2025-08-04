@@ -195,6 +195,17 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: async () => {
+        if (AUTH_DISABLED) {
+          console.log('Logout disabled in demo mode');
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: null,
+          });
+          return;
+        }
+
         try {
           set({ isLoading: true });
 
