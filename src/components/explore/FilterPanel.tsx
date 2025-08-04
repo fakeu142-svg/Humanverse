@@ -179,6 +179,12 @@ export function FilterPanel({
   const savePreset = async () => {
     if (!newPresetName.trim()) return;
 
+    // Only allow saving presets for authenticated users
+    if (!isAuthenticated) {
+      console.warn('Cannot save presets in demo mode');
+      return;
+    }
+
     try {
       const response = await fetch('/api/explore/filter', {
         method: 'POST',
