@@ -47,6 +47,18 @@ export interface AdminPermissions {
 }
 
 /**
+ * Generate device fingerprint for admin sessions
+ */
+export function generateDeviceFingerprint(userAgent: string, ipAddress: string): any {
+  return {
+    userAgent: userAgent || 'unknown',
+    ipAddress: ipAddress || 'unknown',
+    timestamp: new Date().toISOString(),
+    fingerprint: `${ipAddress}-${userAgent}`.slice(0, 100),
+  };
+}
+
+/**
  * Default permissions by role
  */
 const ROLE_PERMISSIONS: Record<AdminRole, AdminPermissions> = {
