@@ -124,7 +124,7 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
           <div className="hidden md:block">
             <div className="ml-4 flex items-center md:ml-6">
               {/* Current Mask Display */}
-              {isAuthenticated && currentMask && (
+              {mounted && isAuthenticated && currentMask && (
                 <div className="flex items-center space-x-3 mr-4 px-3 py-1 bg-white/5 rounded-lg">
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
