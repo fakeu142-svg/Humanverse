@@ -24,34 +24,9 @@ export function useAuth() {
 
   // Auto-check authentication on mount, but only after hydration with debounce
   useEffect(() => {
-    // Skip auto auth check in demo environments to prevent fetch errors
-    const isDemo = typeof window !== 'undefined' && (
-      window.location.hostname.includes('fly.dev') ||
-      window.location.hostname.includes('localhost') ||
-      process.env.NODE_ENV === 'development'
-    );
-
-    if (isDemo) {
-      return;
-    }
-
-    if (mounted && !isAuthenticated && !user && !isLoading) {
-      // Clear any existing timeout
-      if (authCheckRef.current) {
-        clearTimeout(authCheckRef.current);
-      }
-
-      // Debounce auth check to prevent rapid calls
-      authCheckRef.current = setTimeout(() => {
-        checkAuth();
-      }, 100);
-    }
-
-    return () => {
-      if (authCheckRef.current) {
-        clearTimeout(authCheckRef.current);
-      }
-    };
+    // Completely disable auth checks to prevent fetch errors
+    console.log('Auth checks disabled in this environment');
+    return;
   }, [mounted, checkAuth, isAuthenticated, user, isLoading]);
 
   return {
