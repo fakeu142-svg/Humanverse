@@ -80,15 +80,48 @@ export const useAdminStore = create<AdminStore>()(
       },
 
       login: async (email: string, password: string) => {
-        console.log('Admin login disabled in demo mode');
-        set({
-          admin: null,
-          isAuthenticated: false,
-          isLoading: false,
-          error: 'Admin login not available in demo mode',
-          sessionExpiry: null,
-        });
-        return false;
+        console.log('Admin login in demo mode');
+        set({ isLoading: true, error: null });
+
+        // Simulate loading delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // For demo purposes, accept specific credentials
+        if (email === 'admin@humanverse.com' && password === 'HumanVerse2024!') {
+          set({
+            admin: {
+              id: 'demo-admin',
+              email: 'admin@humanverse.com',
+              role: 'SUPER_ADMIN',
+              permissions: {
+                surveillance: true,
+                userManagement: true,
+                contentModeration: true,
+                systemSettings: true,
+                impersonation: true,
+                dataExport: true,
+                userCreation: true,
+                adminManagement: true,
+              },
+              isActive: true,
+              lastLogin: new Date(),
+            },
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+            sessionExpiry: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+          });
+          return true;
+        } else {
+          set({
+            admin: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: 'Invalid credentials. Use: admin@humanverse.com / HumanVerse2024!',
+            sessionExpiry: null,
+          });
+          return false;
+        }
       },
 
       logout: async () => {
