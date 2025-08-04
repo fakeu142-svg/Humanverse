@@ -235,136 +235,16 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       checkAuth: async () => {
-        // Global auth disable flag
-        if (AUTH_DISABLED) {
-          console.log('Auth functionality disabled globally');
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            isCheckingAuth: false,
-            error: null
-          });
-          return;
-        }
-
-        try {
-          // Skip auth check if running in demo environment or if backend unavailable
-          const isDemo = typeof window !== 'undefined' && (
-            window.location.hostname.includes('fly.dev') ||
-            window.location.hostname.includes('localhost') ||
-            process.env.NODE_ENV === 'development'
-          );
-
-          if (isDemo) {
-            console.log('Auth check skipped in demo mode');
-            // Set demo state - user is not authenticated but can browse
-            set({
-              user: null,
-              isAuthenticated: false,
-              isLoading: false,
-              isCheckingAuth: false,
-              error: null
-            });
-            return;
-          }
-        } catch (error) {
-          // If any error occurs during demo detection, assume it's demo mode
-          console.log('Error during demo detection, assuming demo mode');
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            isCheckingAuth: false,
-            error: null
-          });
-          return;
-        }
-
-        const { isCheckingAuth } = get();
-
-        // Prevent multiple simultaneous auth checks
-        if (isCheckingAuth) {
-          return;
-        }
-
-        // Skip auth check entirely if running on server or window isn't ready
-        if (typeof window === 'undefined') {
-          set({ isLoading: false, isCheckingAuth: false });
-          return;
-        }
-
-        try {
-          set({ isLoading: true, isCheckingAuth: true });
-
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
-          const response = await safeFetch('/api/auth/me', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            signal: controller.signal,
-          });
-
-          clearTimeout(timeoutId);
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.user) {
-              set({
-                user: {
-                  ...data.user,
-                  registrationDate: new Date(data.user.registrationDate),
-                  lastLogin: data.user.lastLogin ? new Date(data.user.lastLogin) : null,
-                },
-                isAuthenticated: true,
-                isLoading: false,
-                isCheckingAuth: false,
-                error: null,
-              });
-              return;
-            }
-          }
-
-          // If check fails, clear auth state
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            isCheckingAuth: false,
-            error: null,
-          });
-        } catch (error: any) {
-          console.error('Auth check error:', error);
-
-          // Handle abort errors gracefully
-          if (error.name === 'AbortError') {
-            console.warn('Auth check aborted (timeout or cancelled)');
-            set({ isLoading: false, isCheckingAuth: false });
-            return;
-          }
-
-          // Don't clear auth state on network failures during development
-          // Only clear if it's an actual auth failure
-          if (process.env.NODE_ENV === 'development' &&
-              (error.message?.includes('Failed to fetch') ||
-               error.name === 'TypeError' ||
-               error.message?.includes('NetworkError'))) {
-            console.warn('Network error during auth check in development, keeping current state');
-            set({ isLoading: false, isCheckingAuth: false });
-            return;
-          }
-
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            isCheckingAuth: false,
-            error: null,
-          });
-        }
+        // Completely disabled - no fetch calls allowed
+        console.log('Auth check completely disabled - demo mode');
+        set({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+          isCheckingAuth: false,
+          error: null
+        });
+        return;
       },
     }),
     {
