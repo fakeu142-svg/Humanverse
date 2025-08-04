@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import AppNavigation from '@/components/navigation/AppNavigation';
