@@ -36,7 +36,36 @@ export async function POST(request: NextRequest) {
     // Generate device fingerprint
     const deviceInfo = generateDeviceFingerprint(userAgent, ipAddress);
 
-    // Attempt login
+    // Handle demo credentials for testing
+    if (email === 'demo@humanverse.com' && password === 'demo123') {
+      const demoUser = {
+        id: 'demo-user-123',
+        email: 'demo@humanverse.com',
+        isActive: true,
+        registrationDate: new Date('2024-01-01'),
+        lastLogin: new Date(),
+        riskScore: 0.1,
+      };
+
+      const response = NextResponse.json({
+        success: true,
+        user: demoUser,
+        message: 'Demo login successful',
+      });
+
+      // Set a demo token cookie
+      response.cookies.set('auth-token', 'demo-token-123', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60, // 7 days
+        path: '/',
+      });
+
+      return response;
+    }
+
+    // Attempt normal login
     const session = await loginUser({
       email,
       password,
