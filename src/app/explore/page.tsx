@@ -7,6 +7,12 @@ import { useAuth } from '@/hooks/useAuth';
 export default function ExplorePage() {
   const { user } = useAuth();
   const [backgroundOffset, setBackgroundOffset] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure component is mounted before checking auth status
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Parallax scrolling effect
   useEffect(() => {
@@ -18,8 +24,8 @@ export default function ExplorePage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Show demo content for unauthenticated users
-  const isDemo = !user;
+  // Show demo content for unauthenticated users (only after mounting)
+  const isDemo = mounted ? !user : true;
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
