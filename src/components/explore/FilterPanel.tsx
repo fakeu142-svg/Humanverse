@@ -268,12 +268,14 @@ export function FilterPanel({
         <div className="border-b border-gray-700 p-4 bg-gray-800/50">
           <div className="flex items-center justify-between mb-3">
             <h4 className="font-medium text-white">Filter Presets</h4>
-            <button
-              onClick={() => setShowSavePreset(!showSavePreset)}
-              className="text-blue-400 hover:text-blue-300 text-sm"
-            >
-              💾 Save Current
-            </button>
+            {mounted && isAuthenticated && (
+              <button
+                onClick={() => setShowSavePreset(!showSavePreset)}
+                className="text-blue-400 hover:text-blue-300 text-sm"
+              >
+                💾 Save Current
+              </button>
+            )}
           </div>
 
           {showSavePreset && (
