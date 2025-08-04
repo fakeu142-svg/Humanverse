@@ -145,6 +145,12 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       register: async (email: string, password: string) => {
+        if (AUTH_DISABLED) {
+          console.log('Registration disabled in demo mode');
+          set({ isLoading: false, error: 'Registration not available in demo mode' });
+          return false;
+        }
+
         try {
           set({ isLoading: true, error: null });
 
