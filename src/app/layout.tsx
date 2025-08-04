@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
 import ConditionalLayout from '@/components/layout/ConditionalLayout'
+import '@/lib/fetch-protection'
 
 const inter = Inter({ subsets: ['latin'] })
 
