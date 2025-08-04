@@ -11,10 +11,10 @@ interface AuthGuardProps {
   requiredMask?: boolean;
 }
 
-export function AuthGuard({ 
-  children, 
+export function AuthGuard({
+  children,
   fallback,
-  requiredMask = false 
+  requiredMask = false
 }: AuthGuardProps) {
   const router = useRouter();
   const { isAuthenticated, user, checkAuth, isLoading } = useAuthStore();
@@ -23,6 +23,18 @@ export function AuthGuard({
     // Auth checks completely disabled in demo mode
     console.log('AuthGuard: Auth checks disabled');
   }, [checkAuth]);
+
+  // In demo mode, always allow access
+  const isDemo = typeof window !== 'undefined' && (
+    window.location.hostname.includes('fly.dev') ||
+    window.location.hostname.includes('localhost') ||
+    process.env.NODE_ENV === 'development'
+  );
+
+  if (isDemo) {
+    console.log('Demo mode - allowing access without authentication');
+    return <>{children}</>;
+  }
 
   // Show loading state
   if (isLoading) {
@@ -49,7 +61,7 @@ export function AuthGuard({
           <p className="text-gray-400 max-w-md">
             Please log in to explore the Humanverse
           </p>
-          <Link 
+          <Link
             href="/login"
             className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300"
           >
@@ -70,7 +82,7 @@ export function AuthGuard({
           <p className="text-gray-400 max-w-md">
             You need to select a mask before accessing this area
           </p>
-          <Link 
+          <Link
             href="/mask-selection"
             className="inline-block bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300"
           >
