@@ -200,42 +200,67 @@ export const useMaskStore = create<MaskStore>()(
       },
 
       loadAvailableMasks: async () => {
-        try {
-          set({ isLoading: true, error: null });
+        console.log('Loading demo mask types');
+        set({ isLoading: true, error: null });
 
-          const response = await fetch('/api/masks/available');
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || 'Failed to load available masks');
+        // Demo mask types
+        const demoMaskTypes: MaskTypeInfo[] = [
+          {
+            type: 'SHADOW',
+            name: 'Shadow Walker',
+            baseColor: '#2D1B69',
+            icon: '🌑',
+            description: 'Move unseen through the digital realm. Masters of stealth and observation.',
+            rarity: 'common',
+            personality: ['Mysterious', 'Observant', 'Strategic']
+          },
+          {
+            type: 'NEON',
+            name: 'Neon Rebel',
+            baseColor: '#FF0080',
+            icon: '⚡',
+            description: 'Electric personalities who light up the darkness with vibrant energy.',
+            rarity: 'uncommon',
+            personality: ['Energetic', 'Bold', 'Creative']
+          },
+          {
+            type: 'CRYSTAL',
+            name: 'Crystal Sage',
+            baseColor: '#00FFD1',
+            icon: '💎',
+            description: 'Wisdom flows through them like light through a prism. Seekers of truth.',
+            rarity: 'rare',
+            personality: ['Wise', 'Intuitive', 'Peaceful']
+          },
+          {
+            type: 'VOID',
+            name: 'Void Dancer',
+            baseColor: '#000000',
+            icon: '🕳️',
+            description: 'They embrace the unknown and dance between realities.',
+            rarity: 'epic',
+            personality: ['Enigmatic', 'Fearless', 'Transcendent']
+          },
+          {
+            type: 'PHOENIX',
+            name: 'Phoenix Rising',
+            baseColor: '#FF4500',
+            icon: '🔥',
+            description: 'Reborn from digital ashes, they bring transformation and renewal.',
+            rarity: 'legendary',
+            personality: ['Transformative', 'Passionate', 'Resilient']
           }
+        ];
 
-          if (data.success) {
-            set({
-              availableMaskTypes: data.maskTypes,
-              currentMask: data.currentMask ? {
-                id: data.currentMask.id,
-                name: data.currentMask.name,
-                type: data.currentMask.type,
-                colorScheme: data.currentMask.colorScheme,
-                expiresAt: data.currentMask.expiresAt ? new Date(data.currentMask.expiresAt) : null,
-                streakCount: data.currentMask.streakCount,
-                timeRemaining: data.currentMask.timeRemaining,
-              } : null,
-              isLoading: false,
-              error: null,
-            });
-
-            if (data.currentMask) {
-              get().addToHistory(data.currentMask);
-            }
-          }
-        } catch (error: any) {
+        // Simulate async loading
+        setTimeout(() => {
           set({
+            availableMaskTypes: demoMaskTypes,
+            currentMask: null,
             isLoading: false,
-            error: error.message || 'Failed to load available masks',
+            error: null,
           });
-        }
+        }, 500);
       },
 
       updateTimeRemaining: () => {
