@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 
 export function useAuth() {
   const [mounted, setMounted] = useState(false);
+  const authCheckRef = useRef<NodeJS.Timeout | null>(null);
   const {
     user,
     isAuthenticated,
@@ -21,12 +22,26 @@ export function useAuth() {
     setMounted(true);
   }, []);
 
-  // Auto-check authentication on mount, but only after hydration
+  // Auto-check authentication on mount, but only after hydration with debounce
   useEffect(() => {
-    if (mounted && !isAuthenticated && !user) {
-      checkAuth();
+    if (mounted && !isAuthenticated && !user && !isLoading) {
+      // Clear any existing timeout
+      if (authCheckRef.current) {
+        clearTimeout(authCheckRef.current);
+      }
+
+      // Debounce auth check to prevent rapid calls
+      authCheckRef.current = setTimeout(() => {
+        checkAuth();
+      }, 100);
     }
-  }, [mounted, checkAuth, isAuthenticated, user]);
+
+    return () => {
+      if (authCheckRef.current) {
+        clearTimeout(authCheckRef.current);
+      }
+    };
+  }, [mounted, checkAuth, isAuthenticated, user, isLoading]);
 
   return {
     user,
