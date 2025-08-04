@@ -65,6 +65,19 @@ export default function ExplorePage() {
         />
       </div>
 
+      {/* Demo Banner */}
+      {isDemo && (
+        <div className="relative z-20 bg-gradient-to-r from-red-600 to-purple-600 text-white py-3">
+          <div className="max-w-7xl mx-auto px-6 text-center">
+            <p className="text-sm md:text-base">
+              🎭 <strong>Demo Mode</strong> - Experiencing Humanverse as a guest.
+              <a href="/register" className="underline ml-2 hover:text-yellow-300">Create account</a> or
+              <a href="/login" className="underline ml-1 hover:text-yellow-300">login</a> for full access.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <div className="relative z-10 pt-20 pb-16">
         <div className="max-w-7xl mx-auto px-6 text-center">
