@@ -12,6 +12,11 @@ interface ConditionalLayoutProps {
 export default function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname();
   const { isAuthenticated } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Pages that should NOT show navigation
   const pagesWithoutNav = [
@@ -22,12 +27,14 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
     '/admin/soulgate'
   ];
 
-  // Pages that should show navigation even in demo mode
+  // Pages that should show navigation even in demo mode (only after mounting)
   const demoPages = ['/explore', '/truth', '/chat', '/dropzone', '/mask-selection'];
-  const isDemoPage = demoPages.some(page => pathname.startsWith(page));
+  const isDemoPage = mounted ? demoPages.some(page => pathname.startsWith(page)) : false;
 
-  // Check if current page should show navigation
-  const shouldShowNav = (isAuthenticated || isDemoPage) && !pagesWithoutNav.includes(pathname) && !pathname.startsWith('/admin/');
+  // Check if current page should show navigation (conservative approach until mounted)
+  const shouldShowNav = mounted ?
+    (isAuthenticated || isDemoPage) && !pagesWithoutNav.includes(pathname) && !pathname.startsWith('/admin/') :
+    false;
 
   return (
     <>
