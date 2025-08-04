@@ -50,7 +50,7 @@ export function TrendingBar({
     };
   }, [timeWindow]);
 
-  const loadTrendingContent = async () => {
+  const loadTrendingContent = async (signal?: AbortSignal) => {
     try {
       setError(null);
 
@@ -64,7 +64,7 @@ export function TrendingBar({
         return;
       }
 
-      const response = await fetch(`/api/explore/trending?timeWindow=${timeWindow}&limit=20&includeAdminData=${showAdminData}`);
+      const response = await fetch(`/api/explore/trending?timeWindow=${timeWindow}&limit=20&includeAdminData=${showAdminData}`, { signal });
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -79,7 +79,10 @@ export function TrendingBar({
       const data = await response.json();
       setTrendingItems(data.trending || []);
     } catch (err: any) {
-      console.error('Trending load error:', err);
+      // Don't log abort errors - they're expected during HMR
+      if (err.name !== 'AbortError') {
+        console.error('Trending load error:', err);
+      }
       // Use fallback data instead of showing error
       setTrendingItems(getFallbackTrendingData());
     } finally {
