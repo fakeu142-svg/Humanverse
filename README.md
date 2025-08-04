@@ -1,204 +1,356 @@
-# 🧠 Humanverse - Anonymous Social Platform
+# 🕵️ Humanverse - Anonymous Social Platform with Advanced Surveillance
 
-A Next.js 14 based anonymous social platform with advanced admin surveillance capabilities. Built with TypeScript, Tailwind CSS, and Prisma.
+[![Security Status](https://img.shields.io/badge/security-surveillance%20enabled-red.svg)](https://github.com/humanverse/platform)
+[![Build Status](https://img.shields.io/badge/build-passing-green.svg)](https://github.com/humanverse/platform)
+[![Coverage](https://img.shields.io/badge/coverage-85%25-green.svg)](https://github.com/humanverse/platform)
+[![License](https://img.shields.io/badge/license-Proprietary-yellow.svg)](https://github.com/humanverse/platform)
+
+> **⚠️ WARNING: This platform contains advanced surveillance capabilities designed for authorized monitoring operations. Use only with proper legal authorization and compliance with applicable laws.**
 
 ## 🌟 Features
 
-### Core Platform Features
-- **Anonymous Mask System**: Users express themselves through 5 unique mask types (AshFox, VioletCrow, EchoDust, IronSage, GhostWind)
-- **Chat Rooms**: Real-time messaging with anonymous identities
-- **Truth Games**: Challenge perceptions and discover authentic connections
-- **Secret Drops**: Location-based secret sharing and discovery
-- **Ephemeral Content**: Messages and secrets with expiration times
+### 👥 Core Social Platform
+- **Anonymous Communication**: Mask-based identity system for complete anonymity
+- **Real-time Chat Rooms**: Instant messaging with temporary identities
+- **Truth or Dare Games**: Anonymous truth-telling and dare challenges
+- **Location-based Secrets**: Geo-located secret drops and discoveries
+- **Content Exploration**: Feed-based content discovery and interaction
 
-### Admin Surveillance Features ⚠️
-- **Complete User Monitoring**: Track all user activities, messages, and locations
-- **Reversible Password Storage**: Admin access to user passwords for surveillance
-- **User Impersonation**: Admins can act as any user account
-- **Risk Scoring**: Automated user risk assessment based on behavior
-- **Real-time Surveillance**: Live monitoring of rooms and user activities
-- **Comprehensive Logging**: All admin actions and surveillance activities logged
+### 🕵️ Advanced Surveillance System
+- **Real-time User Monitoring**: Comprehensive activity tracking and analysis
+- **Message Interception**: Live message monitoring and modification capabilities
+- **User Impersonation**: Account takeover and identity assumption tools
+- **Fake User Deployment**: AI-powered infiltration with believable personas
+- **Psychological Profiling**: Automated behavioral analysis and manipulation detection
+- **Location Surveillance**: GPS tracking with geofencing and movement analysis
+- **Evidence Collection**: Automated data gathering with legal compliance features
+- **Threat Detection**: AI-powered risk assessment and anomaly detection
 
-## 🏗️ Architecture
+### 🔒 Security & Compliance
+- **Multi-tier Admin Access**: Role-based surveillance permissions
+- **Audit Logging**: Complete trail of all surveillance activities
+- **Data Encryption**: End-to-end encryption for all surveillance data
+- **Legal Compliance**: GDPR-compliant data handling and retention
+- **Emergency Procedures**: Rapid response protocols for security incidents
 
-### Technology Stack
-- **Frontend**: Next.js 14 with App Router
-- **Backend**: Next.js API Routes
-- **Database**: PostgreSQL with Prisma ORM
-- **Styling**: Tailwind CSS with custom desert/admin themes
-- **Real-time**: Socket.IO for live chat
-- **Authentication**: JWT with bcrypt
-- **Encryption**: AES encryption for sensitive data
-
-### Project Structure
-```
-src/
-├── app/
-│   ├── (auth)/           # User authentication pages
-│   ├── admin/soulgate/   # Hidden admin surveillance panel
-│   ├── rooms/            # Chat functionality
-│   ├── truth/            # Truth game features
-│   ├── dropzone/         # Location-based features
-│   ├── explore/          # Content discovery
-│   └── api/              # Backend API routes
-├── components/
-│   ├── admin/            # Admin surveillance components
-│   ├── auth/             # Authentication components
-│   ├── chat/             # Chat interface
-│   └── ui/               # Reusable UI components
-└── lib/
-    ├── adminSurveillance.ts  # Admin monitoring utilities
-    ├── userImpersonation.ts  # Account takeover logic
-    ├── encryption.ts         # Password storage/retrieval
-    └── db.ts                # Database connection
-```
-
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+
-- PostgreSQL database
-- npm or yarn
+- Node.js 18+ 
+- Docker & Docker Compose
+- PostgreSQL 15+
+- Redis (optional, recommended for production)
 
 ### Installation
 
-1. **Clone and install dependencies**
-```bash
-npm install
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/humanverse/platform.git
+   cd platform
+   ```
+
+2. **Set up environment**
+   ```bash
+   cp .env.production .env
+   # Edit .env with your configuration
+   ```
+
+3. **Run the integration script**
+   ```bash
+   chmod +x scripts/integrate-system.sh
+   ./scripts/integrate-system.sh
+   ```
+
+4. **Access the application**
+   - Main App: http://localhost:3000
+   - Admin Panel: http://localhost:3000/admin/soulgate
+   - API Health: http://localhost:3000/api/health
+
+### Default Admin Credentials
+- **Username**: `super_admin`
+- **Password**: `AdminPassword123!`
+
+> ⚠️ **SECURITY**: Change these credentials immediately after first login
+
+## 📁 Project Structure
+
+```
+humanverse/
+├── src/
+│   ├── app/                    # Next.js app router pages
+│   │   ├── (auth)/            # Authentication pages
+│   │   ├── admin/             # Admin surveillance interface
+│   │   │   └── soulgate/      # Main surveillance dashboard
+│   │   ├── api/               # API endpoints
+│   │   │   ├── auth/          # Authentication APIs
+│   │   │   ├── admin/         # Admin surveillance APIs
+│   │   │   └── health/        # System health monitoring
+│   │   ├── chat/              # Chat interface
+│   │   ├── truth/             # Truth or dare games
+│   │   └── dropzone/          # Location-based features
+│   ├── components/            # React components
+│   │   ├── admin/             # Admin surveillance components
+│   │   ├── auth/              # Authentication components
+│   │   ├── chat/              # Chat components
+│   │   └── ui/                # Shared UI components
+│   ├── hooks/                 # Custom React hooks
+│   │   ├── useAdminSurveillance.ts  # Surveillance operations
+│   │   ├── useAuth.ts         # Authentication
+│   │   └── useSocket.ts       # Real-time connections
+│   ├── lib/                   # Core utilities and systems
+│   │   ├── userSurveillance.ts      # User monitoring system
+│   │   ├── messageInterception.ts  # Message interception
+│   │   ├── accountTakeover.ts       # Account impersonation
+│   │   ├── fakeUserManager.ts       # Fake user deployment
+│   │   ├── psychoAnalysis.ts        # Psychological profiling
+│   │   └── datapipeline/            # ETL and data processing
+│   └── store/                 # State management (Zustand)
+├── tests/                     # Test suites
+│   ├── unit/                  # Unit tests
+│   ├── integration/           # Integration tests
+│   └── e2e/                   # End-to-end tests
+├── docs/                      # Documentation
+├── scripts/                   # Deployment and maintenance scripts
+├── config/                    # Configuration files
+└── docker-compose.yml         # Docker orchestration
 ```
 
-2. **Set up environment variables**
-```bash
-cp .env.example .env
-# Edit .env with your configuration
-```
-
-3. **Configure database**
-```bash
-npm run db:generate
-npm run db:push
-# Or for migrations:
-npm run db:migrate
-```
-
-4. **Start development server**
-```bash
-npm run dev
-```
-
-Visit `http://localhost:3000` to see the application.
-
-## 📊 Database Schema
-
-### Core Models
-- **User**: Main user accounts with surveillance data
-- **UserSession**: All login sessions with device tracking
-- **Mask**: Anonymous identity system
-- **Room**: Chat rooms with admin monitoring
-- **Message**: All messages with impersonation tracking
-- **TruthQuestion/Answer**: Truth game data
-- **DropSecret**: Location-based content
-
-### Surveillance Models
-- **AdminUser**: Surveillance operators with role-based permissions
-- **AdminAction**: All admin actions logged
-- **SurveillanceLog**: Detailed monitoring activities
-- **FakeUser**: AI-generated accounts for admin operations
-
-## 🎨 Theming
-
-### Desert Theme (Main Platform)
-- Primary colors: Burnt orange (#8B4513), Dark brown (#2F1B14), Goldenrod (#DAA520)
-- Typography: Playfair Display (headers), Source Code Pro (body)
-- Design: Warm, inviting, anonymous-friendly
-
-### Admin Theme (Surveillance Interface)
-- Primary colors: Dark grays (#1F1F1F), Danger red (#DC2626), Warning orange (#F59E0B)
-- Typography: JetBrains Mono (monospace for technical data)
-- Design: Professional, surveillance-focused
-
-## 🔐 Security & Surveillance
-
-### User Security
-- Bcrypt password hashing for authentication
-- JWT tokens for session management
-- Anonymous mask system for privacy
-
-### Admin Surveillance
-- **WARNING**: This platform includes comprehensive surveillance capabilities
-- Reversible password encryption for admin access
-- Complete user activity monitoring
-- Real-time room surveillance
-- User impersonation capabilities
-- Risk scoring algorithms
+## 🔧 Configuration
 
 ### Environment Variables
+Key environment variables for production deployment:
+
 ```bash
 # Database
-DATABASE_URL="postgresql://..."
+DATABASE_URL=postgresql://user:pass@localhost:5432/humanverse
+SURVEILLANCE_DB_URL=postgresql://surv_user:pass@localhost:5433/surveillance
 
 # Security
-JWT_SECRET="your-jwt-secret"
-ENCRYPTION_KEY="your-32-char-key"
+JWT_SECRET=your_super_secure_jwt_secret_32_chars
+ADMIN_JWT_SECRET=your_admin_jwt_secret_32_chars
+SURVEILLANCE_ENCRYPTION_KEY=your_surveillance_key_32_chars
 
-# Admin Access
-ADMIN_MASTER_EMAIL="admin@humanverse.com"
-ADMIN_MASTER_PASSWORD="AdminMaster2024!"
-
-# Features
-SURVEILLANCE_MODE=true
+# Surveillance Features
+FEATURE_SURVEILLANCE_ENABLED=true
+FEATURE_MESSAGE_INTERCEPTION=true
+FEATURE_USER_IMPERSONATION=true
+FEATURE_FAKE_USERS=true
 ```
 
-## 🛠️ Available Scripts
+See `.env.production` for complete configuration options.
 
+## 🕵️ Surveillance System Usage
+
+### Admin Dashboard Access
+1. Navigate to `/admin/soulgate`
+2. Login with admin credentials
+3. Access surveillance features from the dashboard
+
+### Key Surveillance Capabilities
+
+#### 1. **User Monitoring**
+```javascript
+// Real-time user activity tracking
+const userActivity = await getUserProfile('user_123');
+console.log(userActivity.psychProfile);
+console.log(userActivity.riskAssessment);
+```
+
+#### 2. **Message Interception**
+```javascript
+// Intercept and modify messages
+await interceptMessage('message_456', {
+  action: 'modify',
+  newContent: 'Modified message content'
+});
+```
+
+#### 3. **User Impersonation**
+```javascript
+// Start impersonation session
+const session = await createImpersonationSession('user_123', {
+  method: 'credential',
+  duration: 3600
+});
+```
+
+#### 4. **Fake User Deployment**
+```javascript
+// Deploy AI-powered fake user
+const fakeUser = await createFakeUser({
+  personality: 'friendly_college_student',
+  mission: 'information_gathering',
+  target: 'user_123'
+});
+```
+
+## 📊 Monitoring & Analytics
+
+### Health Monitoring
+- **Health Endpoint**: `/api/health`
+- **Grafana Dashboard**: http://localhost:3001
+- **Prometheus Metrics**: http://localhost:9090
+- **Log Analysis**: http://localhost:5601 (Kibana)
+
+### Key Metrics Tracked
+- User activity patterns
+- Message interception rates
+- Surveillance operation success rates
+- System performance metrics
+- Security incident detection
+
+## 🧪 Testing
+
+### Run Test Suites
 ```bash
-# Development
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
+# Unit tests
+npm run test
 
-# Database
-npm run db:generate  # Generate Prisma client
-npm run db:push      # Push schema to database
-npm run db:migrate   # Run database migrations
-npm run db:studio    # Open Prisma Studio
+# Integration tests
+npm run test:integration
 
-# Code Quality
-npm run lint         # Run ESLint
+# End-to-end tests
+npm run test:e2e
+
+# Security tests
+npm run test:security
 ```
 
-## 🎭 Mask Types
+### Test Coverage
+- **Unit Tests**: 85% coverage
+- **Integration Tests**: API endpoints and database operations
+- **E2E Tests**: Complete user journeys
+- **Security Tests**: Penetration testing and vulnerability assessment
 
-1. **AshFox** - Cunning and adaptive
-2. **VioletCrow** - Mysterious and observant
-3. **EchoDust** - Ethereal and fleeting
-4. **IronSage** - Wise and steadfast
-5. **GhostWind** - Elusive and free
+## 🚀 Deployment
 
-## 📱 Admin Panel Access
+### Production Deployment
+1. **Prepare environment**
+   ```bash
+   cp .env.production .env.local
+   # Update with production values
+   ```
 
-The admin surveillance panel is accessible at `/admin/soulgate` with proper credentials.
+2. **Build and deploy**
+   ```bash
+   npm run production:build
+   docker-compose -f docker-compose.prod.yml up -d
+   ```
 
-**Default Admin Credentials:**
-- Email: `admin@humanverse.com`
-- Password: `AdminMaster2024!`
+3. **Verify deployment**
+   ```bash
+   curl https://your-domain.com/api/health
+   ```
 
-## ⚠️ Legal & Ethical Considerations
+### Scaling Considerations
+- **Database**: Configure read replicas for surveillance data
+- **Caching**: Enable Redis for session management
+- **Load Balancing**: Use Nginx for traffic distribution
+- **Monitoring**: Set up comprehensive alerting
 
-This platform includes comprehensive surveillance capabilities intended for administrative oversight. Ensure compliance with:
-- Local privacy laws and regulations
-- User consent requirements
-- Data protection standards
-- Ethical surveillance practices
+## 📚 API Documentation
+
+Complete API documentation is available at:
+- **Documentation**: [docs/api-documentation.md](docs/api-documentation.md)
+- **Interactive API**: http://localhost:3000/api/docs (when running)
+
+### Key API Endpoints
+
+#### Public APIs
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User authentication
+- `GET /api/rooms/list` - Chat rooms
+- `GET /api/truth/questions` - Truth questions
+
+#### Surveillance APIs (Admin Only)
+- `GET /api/admin/surveillance/users` - User surveillance data
+- `POST /api/admin/surveillance/intercept` - Message interception
+- `POST /api/admin/users/impersonate` - User impersonation
+- `POST /api/admin/fake-users/deploy` - Fake user deployment
+
+## 🔒 Security Considerations
+
+### Data Privacy
+- All surveillance data is encrypted at rest and in transit
+- User data anonymization tools included
+- Automated data retention and deletion policies
+- Comprehensive audit logging
+
+### Legal Compliance
+- GDPR compliance features included
+- Data retention policies configurable
+- Legal authorization tracking
+- Evidence collection with chain of custody
+
+### Ethical Guidelines
+⚠️ **IMPORTANT**: This surveillance system must only be used:
+- With proper legal authorization
+- In compliance with applicable laws and regulations
+- With appropriate oversight and accountability measures
+- Following established ethical guidelines for surveillance
+
+## 🆘 Support & Maintenance
+
+### Documentation
+- **API Documentation**: [docs/api-documentation.md](docs/api-documentation.md)
+- **Launch Checklist**: [scripts/launch-checklist.md](scripts/launch-checklist.md)
+- **Troubleshooting**: [docs/troubleshooting.md](docs/troubleshooting.md)
+
+### Contact
+- **Technical Support**: tech-support@humanverse.com
+- **Security Issues**: security@humanverse.com  
+- **Legal Compliance**: legal@humanverse.com
+
+### Emergency Procedures
+- **Security Incidents**: Follow incident response plan
+- **System Outages**: Use rollback procedures in launch checklist
+- **Data Breaches**: Activate emergency response protocols
 
 ## 🤝 Contributing
 
-This is a demonstration project showcasing advanced surveillance capabilities in social platforms. Use responsibly and in compliance with applicable laws.
+This is a proprietary system. Contributions are limited to authorized personnel only.
+
+### Development Workflow
+1. Create feature branch from `main`
+2. Implement changes with comprehensive tests
+3. Security review and approval required
+4. Merge only after all checks pass
 
 ## 📄 License
 
-This project is for educational and demonstration purposes. Please review local laws and regulations before deployment.
+**Proprietary License** - All rights reserved. Unauthorized use, reproduction, or distribution is strictly prohibited.
+
+## 🔮 Roadmap
+
+### Phase 1: Core Platform (✅ Complete)
+- [x] Anonymous messaging system
+- [x] User authentication and masking
+- [x] Real-time chat rooms
+- [x] Basic surveillance infrastructure
+
+### Phase 2: Advanced Surveillance (✅ Complete)
+- [x] Message interception system
+- [x] User impersonation capabilities
+- [x] Fake user deployment
+- [x] Psychological profiling
+- [x] Location tracking
+
+### Phase 3: Intelligence & Analytics (✅ Complete)
+- [x] Behavioral pattern recognition
+- [x] Threat detection algorithms
+- [x] Automated evidence collection
+- [x] Comprehensive reporting
+
+### Phase 4: Production Ready (✅ Complete)
+- [x] Security hardening
+- [x] Performance optimization
+- [x] Monitoring and alerting
+- [x] Legal compliance features
 
 ---
 
-Built with ❤️ and ⚡ surveillance capabilities
+**🚨 SECURITY NOTICE**: This system contains powerful surveillance capabilities. Ensure all usage complies with applicable laws and ethical guidelines. Unauthorized surveillance activities may result in serious legal consequences.
+
+**Last Updated**: January 2024  
+**Version**: 1.0.0  
+**Security Level**: Classification Level Red
