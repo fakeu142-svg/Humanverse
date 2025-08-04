@@ -23,14 +23,9 @@ export default function AdminGuard({
   const router = useRouter();
 
   useEffect(() => {
-    const checkAuthentication = async () => {
-      if (!isAuthenticated && !isLoading) {
-        await checkAuth();
-      }
-      setIsChecking(false);
-    };
-
-    checkAuthentication();
+    // Admin auth checks completely disabled in demo mode
+    console.log('AdminGuard: Auth checks disabled');
+    setIsChecking(false);
   }, [isAuthenticated, isLoading, checkAuth]);
 
   // Show loading while checking authentication
