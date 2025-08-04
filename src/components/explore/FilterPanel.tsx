@@ -301,6 +301,16 @@ export function FilterPanel({
           )}
 
           <div className="space-y-2 max-h-40 overflow-y-auto">
+            {mounted && !isAuthenticated && (
+              <div className="p-3 bg-purple-900/20 border border-purple-500/30 rounded text-center">
+                <p className="text-purple-300 text-sm">
+                  🎭 <strong>Demo Mode</strong>
+                </p>
+                <p className="text-purple-400 text-xs mt-1">
+                  Login to save custom filter presets
+                </p>
+              </div>
+            )}
             {presets.map(preset => (
               <div
                 key={preset.id}
