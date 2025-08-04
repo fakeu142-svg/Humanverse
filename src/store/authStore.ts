@@ -187,15 +187,26 @@ export const useAuthStore = create<AuthStore>()(
           return;
         }
 
+        // Skip auth check entirely during development if window isn't ready
+        if (process.env.NODE_ENV === 'development' && typeof window === 'undefined') {
+          return;
+        }
+
         try {
           set({ isLoading: true, isCheckingAuth: true });
+
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
           const response = await fetch('/api/auth/me', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
             },
+            signal: controller.signal,
           });
+
+          clearTimeout(timeoutId);
 
           if (response.ok) {
             const data = await response.json();
