@@ -254,7 +254,7 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
                   </div>
                 )}
 
-                {!isAuthenticated && (
+                {mounted && !isAuthenticated && (
                   <div className="flex items-center px-3 mb-3">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center bg-purple-600/20 border-2 border-purple-600/40">
                       🎭
