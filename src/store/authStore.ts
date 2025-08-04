@@ -180,14 +180,29 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       checkAuth: async () => {
-        // Skip auth check if running in demo environment or if backend unavailable
-        const isDemo = window.location.hostname.includes('fly.dev') ||
-                      window.location.hostname.includes('localhost') ||
-                      process.env.NODE_ENV === 'development';
+        try {
+          // Skip auth check if running in demo environment or if backend unavailable
+          const isDemo = typeof window !== 'undefined' && (
+            window.location.hostname.includes('fly.dev') ||
+            window.location.hostname.includes('localhost') ||
+            process.env.NODE_ENV === 'development'
+          );
 
-        if (isDemo) {
-          console.log('Auth check skipped in demo mode');
-          // Set demo state - user is not authenticated but can browse
+          if (isDemo) {
+            console.log('Auth check skipped in demo mode');
+            // Set demo state - user is not authenticated but can browse
+            set({
+              user: null,
+              isAuthenticated: false,
+              isLoading: false,
+              isCheckingAuth: false,
+              error: null
+            });
+            return;
+          }
+        } catch (error) {
+          // If any error occurs during demo detection, assume it's demo mode
+          console.log('Error during demo detection, assuming demo mode');
           set({
             user: null,
             isAuthenticated: false,
