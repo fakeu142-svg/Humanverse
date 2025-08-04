@@ -180,6 +180,12 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       checkAuth: async () => {
+        // Skip auth check entirely in development to prevent fetch errors
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Auth check skipped in development mode');
+          return;
+        }
+
         const { isCheckingAuth } = get();
 
         // Prevent multiple simultaneous auth checks
