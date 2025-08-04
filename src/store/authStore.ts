@@ -107,43 +107,13 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: async () => {
-        if (AUTH_DISABLED) {
-          console.log('Logout disabled in demo mode');
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null,
-          });
-          return;
-        }
-
-        try {
-          set({ isLoading: true });
-
-          await safeFetch('/api/auth/logout', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null,
-          });
-        } catch (error: any) {
-          console.error('Logout error:', error);
-          // Force logout even if API call fails
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null,
-          });
-        }
+        console.log('Logout in demo mode');
+        set({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: null,
+        });
       },
 
       checkAuth: async () => {
