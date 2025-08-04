@@ -101,53 +101,9 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       register: async (email: string, password: string) => {
-        if (AUTH_DISABLED) {
-          console.log('Registration disabled in demo mode');
-          set({ isLoading: false, error: 'Registration not available in demo mode' });
-          return false;
-        }
-
-        try {
-          set({ isLoading: true, error: null });
-
-          const response = await safeFetch('/api/auth/register', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-          });
-
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || 'Registration failed');
-          }
-
-          if (data.success && data.user) {
-            set({
-              user: {
-                ...data.user,
-                registrationDate: new Date(data.user.registrationDate),
-                lastLogin: data.user.lastLogin ? new Date(data.user.lastLogin) : null,
-              },
-              isAuthenticated: true,
-              isLoading: false,
-              error: null,
-            });
-            return true;
-          }
-
-          throw new Error('Invalid response from server');
-        } catch (error: any) {
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: error.message || 'Registration failed',
-          });
-          return false;
-        }
+        console.log('Registration disabled in demo mode');
+        set({ isLoading: false, error: 'Registration not available in demo mode' });
+        return false;
       },
 
       logout: async () => {
