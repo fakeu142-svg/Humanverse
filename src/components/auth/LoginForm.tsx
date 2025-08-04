@@ -146,6 +146,15 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
             )}
           </motion.button>
 
+          {/* Demo Credentials Button */}
+          <button
+            type="button"
+            onClick={useDemoCredentials}
+            className="w-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 font-medium py-2 px-4 rounded-lg transition-all duration-200 border border-blue-600/30 hover:border-blue-600/50 text-sm"
+          >
+            🎭 Use Demo Credentials
+          </button>
+
           <div className="text-center space-y-4">
             <div className="text-desert-400 text-sm">
               Don't have a mask yet?{' '}
