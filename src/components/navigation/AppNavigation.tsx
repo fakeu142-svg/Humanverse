@@ -266,7 +266,7 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
                   </div>
                 )}
 
-                {isAuthenticated ? (
+                {mounted && isAuthenticated ? (
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-3 py-2 text-base font-medium text-red-400 hover:text-red-300 hover:bg-red-600/10 rounded-md transition-colors"
