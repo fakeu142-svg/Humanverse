@@ -236,7 +236,7 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
               
               {/* Mobile User Section */}
               <div className="border-t border-gray-700 pt-4 pb-3">
-                {isAuthenticated && currentMask && (
+                {mounted && isAuthenticated && currentMask && (
                   <div className="flex items-center px-3 mb-3">
                     <div
                       className="w-10 h-10 rounded-full flex items-center justify-center"
