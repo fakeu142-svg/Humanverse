@@ -24,13 +24,14 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
         });
       }
 
-      // If it's an HMR-related fetch failure, handle it gracefully
+      // If it's an HMR-related fetch failure or auth API during development, handle it gracefully
       const url = args[0];
 
       if (typeof url === 'string' && (
         url.includes('/_next/static/') ||
         url.includes('webpack-hmr') ||
-        url.includes('hot-update')
+        url.includes('hot-update') ||
+        (url.includes('/api/auth/') && error.message?.includes('Failed to fetch'))
       )) {
         console.warn('HMR fetch failed, continuing without hot reload:', error.message);
 
