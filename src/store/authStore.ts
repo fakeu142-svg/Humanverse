@@ -1,6 +1,26 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+// Safe fetch wrapper to prevent analytics interference
+const safeFetch = async (url: string, options?: RequestInit) => {
+  try {
+    // Use the original fetch if available, or current implementation
+    const fetchFn = (globalThis as any).__originalFetch || fetch;
+    return await fetchFn(url, options);
+  } catch (error: any) {
+    console.warn('Fetch failed, likely in demo environment:', error.message);
+    // Return a mock failed response
+    return {
+      ok: false,
+      status: 503,
+      statusText: 'Service Unavailable',
+      json: () => Promise.resolve({ error: 'Service unavailable in demo mode' }),
+      text: () => Promise.resolve(''),
+      headers: new Headers(),
+    };
+  }
+};
+
 export interface AuthUser {
   id: string;
   email: string;
