@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useAdminSurveillance } from '@/hooks/useAdminSurveillance';
-import { AdminGuard } from '@/components/admin/AdminGuard';
+import AdminGuard from '@/components/admin/AdminGuard';
 import { 
   UserIcon, 
   ChatBubbleLeftIcon, 
