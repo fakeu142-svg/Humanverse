@@ -10,8 +10,8 @@ export default function AdminLoginPage() {
   const { isAuthenticated, checkAuth } = useAdminStore();
 
   useEffect(() => {
-    // Check if admin is already authenticated
-    checkAuth();
+    // Admin auth checks completely disabled in demo mode
+    console.log('Admin login: Auth checks disabled');
   }, [checkAuth]);
 
   useEffect(() => {
