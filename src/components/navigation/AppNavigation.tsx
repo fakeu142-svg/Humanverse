@@ -61,11 +61,12 @@ export default function AppNavigation({ className = '' }: NavigationProps) {
     }
   ];
 
-  // Show navigation for authenticated users OR for demo pages
+  // Show navigation for authenticated users OR for demo pages (only after mounting)
   const demoPages = ['/explore', '/truth', '/chat', '/dropzone', '/mask-selection'];
-  const isDemoPage = demoPages.some(page => pathname.startsWith(page));
+  const isDemoPage = mounted ? demoPages.some(page => pathname.startsWith(page)) : true;
+  const shouldShow = mounted ? (isAuthenticated || isDemoPage) : true;
 
-  if (!isAuthenticated && !isDemoPage) {
+  if (!shouldShow) {
     return null;
   }
 
