@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useMaskSelection, useMaskStore } from '@/store/maskStore';
+import { useMaskSelection } from '@/store/maskStore';
 import MaskCard from './MaskCard';
 import { toast } from 'react-hot-toast';
 import { MaskType } from '@prisma/client';
