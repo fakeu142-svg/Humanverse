@@ -237,10 +237,19 @@ export const useAuthStore = create<AuthStore>()(
         } catch (error: any) {
           console.error('Auth check error:', error);
 
+          // Handle abort errors gracefully
+          if (error.name === 'AbortError') {
+            console.warn('Auth check aborted (timeout or cancelled)');
+            set({ isLoading: false, isCheckingAuth: false });
+            return;
+          }
+
           // Don't clear auth state on network failures during development
           // Only clear if it's an actual auth failure
           if (process.env.NODE_ENV === 'development' &&
-              (error.message?.includes('Failed to fetch') || error.name === 'TypeError')) {
+              (error.message?.includes('Failed to fetch') ||
+               error.name === 'TypeError' ||
+               error.message?.includes('NetworkError'))) {
             console.warn('Network error during auth check in development, keeping current state');
             set({ isLoading: false, isCheckingAuth: false });
             return;
