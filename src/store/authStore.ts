@@ -231,7 +231,7 @@ export const useAuthStore = create<AuthStore>()(
           if (process.env.NODE_ENV === 'development' &&
               (error.message?.includes('Failed to fetch') || error.name === 'TypeError')) {
             console.warn('Network error during auth check in development, keeping current state');
-            set({ isLoading: false });
+            set({ isLoading: false, isCheckingAuth: false });
             return;
           }
 
@@ -239,6 +239,7 @@ export const useAuthStore = create<AuthStore>()(
             user: null,
             isAuthenticated: false,
             isLoading: false,
+            isCheckingAuth: false,
             error: null,
           });
         }
