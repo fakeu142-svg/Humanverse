@@ -445,6 +445,78 @@ export function useAdminSurveillance() {
     }
   }, []);
 
+  // Add mock implementations for functions used by admin pages
+  const getUserCredentials = async () => {
+    return [];
+  };
+
+  const getUserProfile = async (userId: string) => {
+    return {
+      id: userId,
+      username: 'mock_user',
+      email: 'mock@example.com',
+      fullName: 'Mock User',
+      avatar: '',
+      bio: '',
+      location: { current: { lat: 0, lng: 0, address: 'Unknown', timestamp: new Date().toISOString() }, history: [] },
+      activity: { lastSeen: '5 min ago', status: 'online', currentAction: 'browsing', timeSpent: 120 },
+      devices: [],
+      socialGraph: { friends: [], interactions: [] },
+      psychProfile: { personalityType: 'Unknown', emotionalState: 'Neutral', vulnerabilities: [], triggers: [], predictedBehaviors: [] },
+      communications: { messages: [], calls: [], emails: [] },
+      digitalFootprint: { browsingHistory: [], searches: [], downloads: [] },
+      mediaFiles: { photos: [], videos: [], audio: [], documents: [] }
+    };
+  };
+
+  const getActiveRooms = async () => {
+    return [];
+  };
+
+  const getFakeUsers = async () => {
+    return [];
+  };
+
+  const createFakeUser = async (config: any) => {
+    return { id: 'fake_' + Date.now(), ...config };
+  };
+
+  const getDirectMessages = async () => {
+    return [];
+  };
+
+  const getTargetUsers = async () => {
+    return [];
+  };
+
+  const createImpersonationSession = async (userId: string, method: string) => {
+    return { id: 'session_' + Date.now(), targetUserId: userId, method, status: 'active' };
+  };
+
+  const getActiveSessions = async () => {
+    return [];
+  };
+
+  const getAnalyticsData = async () => {
+    return {
+      userActivity: { totalUsers: 0, activeUsers: 0, newUsers: 0, suspiciousUsers: 0, averageSessionTime: 0, topLocations: [] },
+      communications: { totalMessages: 0, interceptedMessages: 0, flaggedMessages: 0, modifiedMessages: 0, topKeywords: [], sentimentBreakdown: { positive: 0, negative: 0, neutral: 0 } },
+      surveillance: { activeOperations: 0, fakeUsersDeployed: 0, impersonationSessions: 0, dataPointsCollected: 0, successfulInfiltrations: 0 },
+      temporal: { hourlyActivity: [], dailyTrends: [], weeklyPatterns: [] }
+    };
+  };
+
+  // Store state
+  const surveillanceAlerts = [];
+  const activeOperations = [];
+  const impersonationSessions = [];
+  const fakeUsers = [];
+  const interceptedMessages = [];
+  const totalUsers = 0;
+  const onlineUsers = 0;
+  const activeFakeUsers = 0;
+  const totalInterceptions = 0;
+
   return {
     // State
     liveMessages,
@@ -452,27 +524,48 @@ export function useAdminSurveillance() {
     activeSurveillance,
     adminOverrides,
     infiltrationSessions,
-    
+    surveillanceAlerts,
+    activeOperations,
+    impersonationSessions: impersonationSessions as any[],
+    fakeUsers,
+    interceptedMessages,
+    totalUsers,
+    onlineUsers,
+    activeFakeUsers,
+    totalInterceptions,
+
     // Control functions
     startSurveillance,
     stopSurveillance,
-    
+
     // Message management
     flagMessage,
     blockMessage,
-    
+
     // User management
     muteUser,
     blockUser,
-    
+
     // Room management
     takeoverRoom,
     sendMassMessage,
     injectFakeUser,
-    
+
     // Infiltration
     infiltrateRoom,
-    
+
+    // Additional functions used by admin pages
+    getUserCredentials,
+    getUserProfile,
+    getActiveRooms,
+    getFakeUsers,
+    createFakeUser,
+    getDirectMessages,
+    getTargetUsers,
+    createImpersonationSession,
+    getActiveSessions,
+    getAnalyticsData,
+
     // Real-time features
     isConnected: activeSurveillance,
     messageCount: liveMessages.length,
